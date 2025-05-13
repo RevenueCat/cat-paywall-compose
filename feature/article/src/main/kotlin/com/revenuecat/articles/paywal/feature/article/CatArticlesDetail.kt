@@ -70,6 +70,7 @@ import com.revenuecat.articles.paywall.core.designsystem.theme.CatArticlesTheme
 import com.revenuecat.articles.paywall.core.model.Article
 import com.revenuecat.articles.paywall.core.model.MockUtils.mockArticle
 import com.revenuecat.articles.paywall.core.navigation.boundsTransform
+import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.InternalRevenueCatAPI
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.ui.revenuecatui.PaywallDialog
@@ -89,6 +90,7 @@ fun SharedTransitionScope.CatArticlesDetail(
   viewModel: CatArticlesDetailViewModel = hiltViewModel(),
 ) {
   val article by viewModel.article.collectAsStateWithLifecycle()
+  val customerInfo by viewModel.customerInfo.collectAsStateWithLifecycle()
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
   Column(
@@ -105,6 +107,7 @@ fun SharedTransitionScope.CatArticlesDetail(
       CatArticlesDetailContent(
         article = article!!,
         uiState = uiState,
+        customerInfo = customerInfo,
         animatedVisibilityScope = animatedVisibilityScope,
         navigateUp = { viewModel.navigateUp() },
       )
@@ -116,6 +119,7 @@ fun SharedTransitionScope.CatArticlesDetail(
 private fun SharedTransitionScope.CatArticlesDetailContent(
   article: Article,
   uiState: DetailUiState,
+  customerInfo: CustomerInfo?,
   animatedVisibilityScope: AnimatedVisibilityScope,
   navigateUp: () -> Unit,
 ) {
@@ -123,7 +127,9 @@ private fun SharedTransitionScope.CatArticlesDetailContent(
   val backgroundBrush by palette.paletteBackgroundBrush()
 
   val context = LocalContext.current
-  var isVisiblePaywallDialog by remember { mutableStateOf(false) }
+  val entitlementIdentifier = stringResource(R.string.entitlement_premium)
+  val isEntitled = customerInfo?.entitlements[entitlementIdentifier]?.isActive == true
+  var isVisiblePaywallDialog by remember(customerInfo) { mutableStateOf(false) }
 
   DetailsAppBar(
     article = article,
@@ -139,6 +145,7 @@ private fun SharedTransitionScope.CatArticlesDetailContent(
 
   DetailsContent(
     article = article,
+    isEntitled = isEntitled,
     onJoinClicked = {
       if (uiState is DetailUiState.Success) {
         isVisiblePaywallDialog = true
@@ -148,7 +155,7 @@ private fun SharedTransitionScope.CatArticlesDetailContent(
     },
   )
 
-  if (isVisiblePaywallDialog) {
+  if (isVisiblePaywallDialog && !isEntitled) {
     val offering = (uiState as? DetailUiState.Success)?.offering ?: return
     PaywallDialog(
       PaywallDialogOptions.Builder()
@@ -236,13 +243,14 @@ private fun SharedTransitionScope.DetailsHeader(
 @Composable
 private fun DetailsContent(
   article: Article,
+  isEntitled: Boolean,
   onJoinClicked: () -> Unit,
 ) {
   Column(
     modifier = Modifier
       .fillMaxSize()
       .padding(12.dp)
-      .fadingEdge(),
+      .fadingEdge(isEnabled = !isEntitled),
   ) {
     Text(
       text = article.title,
@@ -326,6 +334,7 @@ private fun CatArticlesDetailContentPreview() {
                 availablePackages = listOf(),
               ),
             ),
+            customerInfo = null,
             animatedVisibilityScope = this@AnimatedVisibility,
             navigateUp = {},
           )

@@ -17,9 +17,11 @@ package com.revenuecat.articles.paywall.coredata.repository
 
 import com.revenuecat.articles.paywall.core.network.CatArticlesDispatchers
 import com.revenuecat.articles.paywall.core.network.Dispatcher
+import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesException
+import com.revenuecat.purchases.awaitCustomerInfo
 import com.revenuecat.purchases.awaitOfferings
 import com.skydoves.sandwich.ApiResponse
 import kotlinx.coroutines.CoroutineDispatcher
@@ -43,4 +45,13 @@ internal class DetailsRepositoryImpl @Inject constructor(
       ApiResponse.exception(e)
     }
   }.flowOn(ioDispatcher)
+
+  override fun fetchCustomerInfo(): Flow<CustomerInfo?> = flow {
+    try {
+      val customerInfo = Purchases.sharedInstance.awaitCustomerInfo()
+      emit(customerInfo)
+    } catch (e: PurchasesException) {
+      emit(null)
+    }
+  }
 }
