@@ -11,7 +11,8 @@
 The purpose of this repository is to demonstrate the following:
 
 - In-app purchases (subscriptions) using Google Play Billing.
-- RevenueCat's server-driven UI paywall builder.
+- Server-driven UI based paywall dialog with the RevenueCat's paywall editor.
+- Checking user entitlements.
 - Full UI implementation using Jetpack Compose.
 - Configuring structures with the Android architecture and Jetpack libraries such as Hilt and Jetpack Navigation.
 - A multi-module project structure and using Baseline Profiles to enhance app performance.
