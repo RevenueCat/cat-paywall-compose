@@ -41,6 +41,12 @@ class CatArticlesDetailViewModel @Inject constructor(
 
   val article = savedStateHandle.getStateFlow<Article?>("article", null)
 
+  val customerInfo = repository.fetchCustomerInfo().stateIn(
+    scope = viewModelScope,
+    started = SharingStarted.WhileSubscribed(5000),
+    initialValue = null,
+  )
+
   val uiState: StateFlow<DetailUiState> = repository.fetchOffering()
     .mapLatest { response ->
       response.fold(

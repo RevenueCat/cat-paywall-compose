@@ -15,6 +15,7 @@
  */
 package com.revenuecat.articles.paywall.coredata.repository
 
+import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offering
 import com.skydoves.sandwich.ApiResponse
 import kotlinx.coroutines.flow.Flow
@@ -22,4 +23,6 @@ import kotlinx.coroutines.flow.Flow
 interface DetailsRepository {
 
   fun fetchOffering(): Flow<ApiResponse<Offering>>
+
+  fun fetchCustomerInfo(): Flow<CustomerInfo?>
 }

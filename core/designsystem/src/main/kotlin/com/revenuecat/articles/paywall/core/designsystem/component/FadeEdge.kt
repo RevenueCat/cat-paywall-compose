@@ -24,11 +24,16 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 
 fun Modifier.fadingEdge(
+  isEnabled: Boolean = true,
   brush: Brush =
     Brush.verticalGradient(0.45f to Color.Red, 1f to Color.Transparent),
-) = this
-  .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-  .drawWithContent {
-    drawContent()
-    drawRect(brush = brush, blendMode = BlendMode.DstIn)
-  }
+) = if (isEnabled) {
+  this
+    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+    .drawWithContent {
+      drawContent()
+      drawRect(brush = brush, blendMode = BlendMode.DstIn)
+    }
+} else {
+  this
+}

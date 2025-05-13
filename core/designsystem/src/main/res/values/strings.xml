@@ -19,4 +19,5 @@
   <string name="paywall_title">Read best articles from industry leaders by subscribing Cat Articles 😻</string>
   <string name="paywall_description">This article is available to members only. \nUnlock it to access exclusive member benefits.</string>
   <string name="paywall_cta">Join Cat Articles</string>
+  <string name="entitlement_premium">premium</string>
 </resources>
