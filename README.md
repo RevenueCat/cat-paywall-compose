@@ -1,4 +1,4 @@
-<h1 align="center">Cat Paywall Compose</h1></br>
+![cover](https://github.com/user-attachments/assets/e909dca9-6a3f-47d6-8840-0f21bd89d7d8)
 
 <p align="center">
   <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
@@ -31,6 +31,10 @@ The purpose of this repository is to demonstrate the following:
 ## 🐈 RevenueCat In-App Purchase SDK
 
 Cat Paywall Compose is built using the [RevenueCat SDK for Android](https://www.revenuecat.com/docs/getting-started/installation/android?utm_medium=organic&utm_source=github&utm_campaign=advocate) to implement in-app subscriptions and a paywall system on top of Google Play Billing. [RevenueCat](https://www.revenuecat.com?utm_medium=organic&utm_source=github&utm_campaign=advocate) handles first-party purchases, manages customer data, supports A/B testing, and provides source-of-truth analytics across multiple platforms.
+
+## ✍️ Technical Content
+
+[Turn Your App into Revenue: Building Paywalls in Android With Jetpack Compose](https://www.revenuecat.com/blog/engineering/build-paywalls-compose/): In-app subscriptions have become a popular way to monetize mobile applications that offer recurring value to users. In this article, you'll learn how to seamlessly implement in-app subscriptions and paywall features in Android using Jetpack Compose and the RevenueCat SDK.
 
 ## 🛠 Tech Stack & Open Source Libraries
 - Minimum SDK level 24.
@@ -99,6 +103,8 @@ You can copy-paste the line below:
 REVENUECAT_API_KEY=<YOUR_API_KEY>
 ```
 
+Also, make sure to update the [application ID](https://github.com/RevenueCat/cat-paywall-compose/blob/main/app/build.gradle.kts#L32) to match the one registered for your project on Google Play.
+
 Now, build and run the project. You should see the paywall dialog appear in the details screen if you've followed the steps correctly.
 
 > **Note:** Ensure your device is signed into Google Play, especially if you're running the project on an emulator.
@@ -118,7 +124,7 @@ UI layer = UI elements + ViewModels (UI State).
 The pattern in which state flows downward and events flow upward is known as **unidirectional data flow (UDF)**. This architecture promotes a clear separation of concerns and predictable UI behavior through the following structure:
 
 - The **ViewModel** serves as the source of truth for the UI state, transforming application data into a format suitable for rendering.
-- **UI** elements observes this state and render the content accordingly.
+- **UI** elements observe this state and render the content accordingly.
 - When a user interacts with the UI elements, events are sent upward to the ViewModel.
 - The **ViewModel** processes these events, updates the state as needed, and the new state is emitted back to the UI.
 - This cycle repeats for every event that results in a state change.
