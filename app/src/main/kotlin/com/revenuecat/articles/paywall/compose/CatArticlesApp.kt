@@ -33,11 +33,14 @@ class CatArticlesApp : Application() {
      */
     Purchases.logLevel = LogLevel.DEBUG
 
-    /*
-    Initialize the RevenueCat Purchases SDK.
-
-    - appUserID is nil, so an anonymous ID will be generated automatically by the Purchases SDK. Read more about Identifying Users here: https://docs.revenuecat.com/docs/user-ids
-    - purchasesAreCompletedBy is set to REVENUECAT, so Purchases will automatically handle finishing transactions. Read more about finishing transactions here: https://www.revenuecat.com/docs/migrating-to-revenuecat/sdk-or-not/finishing-transactions
+    /**
+     * Initialize the RevenueCat Purchases SDK.
+     *
+     * `appUserID` is nil, so an anonymous ID will be generated automatically by the Purchases SDK.
+     * Read more about Identifying Users here: https://docs.revenuecat.com/docs/user-ids
+     *
+     * `purchasesAreCompletedBy` is set to REVENUECAT, so Purchases will automatically handle finishing transactions.
+     * Read more about finishing transactions here: https://www.revenuecat.com/docs/migrating-to-revenuecat/sdk-or-not/finishing-transactions
      */
     val builder = PurchasesConfiguration.Builder(this, BuildConfig.REVENUECAT_API_KEY)
     Purchases.configure(
