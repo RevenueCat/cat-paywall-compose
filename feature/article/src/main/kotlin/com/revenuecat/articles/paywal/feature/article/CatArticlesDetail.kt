@@ -21,6 +21,7 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -321,7 +322,7 @@ private fun DetailsContent(
 @Composable
 private fun CatArticlesDetailContentPreview() {
   CatArticlesTheme {
-    SharedTransitionScope {
+    SharedTransitionLayout {
       AnimatedVisibility(visible = true, label = "") {
         Column(modifier = Modifier.fillMaxSize()) {
           CatArticlesDetailContent(

@@ -26,12 +26,11 @@ plugins {
 
 android {
   namespace = "com.revenuecat.articles.paywall.compose"
-  compileSdk = 35
+  compileSdk = 36
 
   defaultConfig {
     applicationId = "com.revenuecat.articles.paywall.compose"
     minSdk = 24
-    targetSdk = 35
     versionCode = 1
     versionName = "1.0"
   }
