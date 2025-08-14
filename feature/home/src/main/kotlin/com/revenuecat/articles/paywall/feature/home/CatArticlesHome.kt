@@ -17,6 +17,7 @@ package com.revenuecat.articles.paywall.feature.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -165,7 +166,7 @@ private fun SharedTransitionScope.ArticleCard(
 @Composable
 private fun HomeContentPreview() {
   CatArticlesTheme {
-    SharedTransitionScope {
+    SharedTransitionLayout {
       AnimatedVisibility(visible = true, label = "") {
         HomeContent(
           uiState = HomeUiState.Success(List(10) { mockArticle }),
@@ -181,7 +182,7 @@ private fun HomeContentPreview() {
 @Composable
 private fun ArticleCardPreview() {
   CatArticlesTheme {
-    SharedTransitionScope {
+    SharedTransitionLayout {
       AnimatedVisibility(visible = true, label = "") {
         ArticleCard(
           article = mockArticle,
