@@ -35,7 +35,25 @@ Cat Paywall Compose is built using the [RevenueCat SDK for Android](https://www.
 
 ## ✍️ Technical Content
 
-[Turn Your App into Revenue: Building Paywalls in Android With Jetpack Compose](https://www.revenuecat.com/blog/engineering/build-paywalls-compose/): In-app subscriptions have become a popular way to monetize mobile applications that offer recurring value to users. In this article, you'll learn how to seamlessly implement in-app subscriptions and paywall features in Android using Jetpack Compose and the RevenueCat SDK.
+- [Turn Your App into Revenue: Building Paywalls in Android With Jetpack Compose](https://www.revenuecat.com/blog/engineering/build-paywalls-compose/): In-app subscriptions have become a popular way to monetize mobile applications that offer recurring value to users. In this article, you'll learn how to seamlessly implement in-app subscriptions and paywall features in Android using Jetpack Compose and the RevenueCat SDK.
+- [How to monetize Android apps with ad-free subscriptions using RevenueCat](https://www.revenuecat.com/blog/engineering/ad-free-subscriptions-android/): Most apps monetize through ads using things like AdMob or Audience Network. To maximize your earnings with ads, you need to show as many of them as possible, which makes for a pretty lousy user experience.
+- [Server-driven UI SDK on Android: how RevenueCat enables remote paywalls without app updates](https://www.revenuecat.com/blog/engineering/server-driven-android/): In this article, we’ll explore the concept of server-driven UI, with a focus on how RevenueCat’s Paywall Editor enables you to build and remotely update paywalls—without needing app updates—using RevenueCat’s Android SDK.
+
+## 💻 Codelab
+
+1. [RevenueCat Google Play Integration](https://revenuecat.github.io/codelab/google-play/codelab-1-google-play-integration/index.html#0): In this codelab, you'll learn how to:
+
+   - Properly configure products on Google Play.
+   - Set up the RevenueCat dashboard and connect it to your Google Play products.
+   - Understanding Product, Offering, Package, and Entitlement.
+   - Create paywalls using the [Paywall Editor](https://www.revenuecat.com/docs/tools/paywalls/creating-paywalls#using-the-editor).
+
+2. [Android In-App Purchases & Paywalls](https://revenuecat.github.io/codelab/android/codelab-2-android-sdk/index.html#0): In this codelab, you will:
+
+   - Integrate the Android RevenueCat SDK into your project
+   - Implement in-app purchases in your Android application
+   - Learn how to distinguish between paying and non-paying users
+   - Build a paywall screen, which is based on server-driven UI approach
 
 ## 🛠 Tech Stack & Open Source Libraries
 - Minimum SDK level 24.
