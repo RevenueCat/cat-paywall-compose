@@ -6,7 +6,7 @@
   <a href="https://github.com/revenuecat/cat-paywall-compose/actions/workflows/android.yml"><img alt="Build Status" src="https://github.com/revenuecat/cat-paywall-compose/actions/workflows/android.yml/badge.svg"/></a>
 </p>
 
-🐈 Cat Paywall Compose shows you how to build a paywall for Google Play's billing system using [RevenueCat's Android SDK](https://www.revenuecat.com/docs/getting-started/quickstart) and Jetpack Compose.
+🐈 Cat Paywall Compose shows you how to build a paywall for Google Play's billing system using [RevenueCat's Android SDK](https://www.revenuecat.com/docs/getting-started/quickstart?utm_medium=organic&utm_source=github&utm_campaign=advocate) and Jetpack Compose.
 
 The purpose of this repository is to demonstrate the following:
 
@@ -46,7 +46,7 @@ Cat Paywall Compose is built using the [RevenueCat SDK for Android](https://www.
    - Properly configure products on Google Play.
    - Set up the RevenueCat dashboard and connect it to your Google Play products.
    - Understanding Product, Offering, Package, and Entitlement.
-   - Create paywalls using the [Paywall Editor](https://www.revenuecat.com/docs/tools/paywalls/creating-paywalls#using-the-editor).
+   - Create paywalls using the [Paywall Editor](https://www.revenuecat.com/docs/tools/paywalls/creating-paywalls#using-the-editor?utm_medium=organic&utm_source=github&utm_campaign=advocate).
 
 2. [Android In-App Purchases & Paywalls](https://revenuecat.github.io/codelab/android/codelab-2-android-sdk/index.html#0): In this codelab, you will:
 
