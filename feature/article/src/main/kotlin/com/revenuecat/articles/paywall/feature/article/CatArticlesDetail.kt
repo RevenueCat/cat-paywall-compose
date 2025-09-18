@@ -17,8 +17,6 @@
 
 package com.revenuecat.articles.paywall.feature.article
 
-import android.app.Activity
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionLayout
@@ -41,16 +39,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,7 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kmpalette.palette.graphics.Palette
 import com.revenuecat.articles.paywall.compose.core.designsystem.R
@@ -71,12 +65,7 @@ import com.revenuecat.articles.paywall.core.designsystem.theme.CatArticlesTheme
 import com.revenuecat.articles.paywall.core.model.Article
 import com.revenuecat.articles.paywall.core.model.MockUtils.mockArticle
 import com.revenuecat.articles.paywall.core.navigation.boundsTransform
-import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.InternalRevenueCatAPI
-import com.revenuecat.purchases.Offering
-import com.revenuecat.purchases.ui.revenuecatui.PaywallDialog
-import com.revenuecat.purchases.ui.revenuecatui.PaywallDialogOptions
-import com.skydoves.compose.effects.RememberedEffect
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
@@ -91,8 +80,6 @@ fun SharedTransitionScope.CatArticlesDetail(
   viewModel: CatArticlesDetailViewModel = hiltViewModel(),
 ) {
   val article by viewModel.article.collectAsStateWithLifecycle()
-  val customerInfo by viewModel.customerInfo.collectAsStateWithLifecycle()
-  val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
   Column(
     modifier = Modifier
@@ -107,8 +94,7 @@ fun SharedTransitionScope.CatArticlesDetail(
     } else {
       CatArticlesDetailContent(
         article = article!!,
-        uiState = uiState,
-        customerInfo = customerInfo,
+        viewModel = viewModel,
         animatedVisibilityScope = animatedVisibilityScope,
         navigateUp = { viewModel.navigateUp() },
       )
@@ -119,18 +105,16 @@ fun SharedTransitionScope.CatArticlesDetail(
 @Composable
 private fun SharedTransitionScope.CatArticlesDetailContent(
   article: Article,
-  uiState: DetailUiState,
-  customerInfo: CustomerInfo?,
+  viewModel: CatArticlesDetailViewModel = hiltViewModel(),
   animatedVisibilityScope: AnimatedVisibilityScope,
   navigateUp: () -> Unit,
 ) {
   var palette by rememberPaletteState()
   val backgroundBrush by palette.paletteBackgroundBrush()
 
-  val context = LocalContext.current
+  val customerInfo by viewModel.customerInfo.collectAsStateWithLifecycle()
   val entitlementIdentifier = stringResource(R.string.entitlement_premium)
   val isEntitled = customerInfo?.entitlements[entitlementIdentifier]?.isActive == true
-  var isVisiblePaywallDialog by remember(customerInfo) { mutableStateOf(false) }
 
   DetailsAppBar(
     article = article,
@@ -146,34 +130,9 @@ private fun SharedTransitionScope.CatArticlesDetailContent(
 
   DetailsContent(
     article = article,
+    onJoinClicked = { viewModel.navigateToCustomPaywalls() },
     isEntitled = isEntitled,
-    onJoinClicked = {
-      if (uiState is DetailUiState.Success) {
-        isVisiblePaywallDialog = true
-      } else if (uiState is DetailUiState.Error) {
-        Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
-      }
-    },
   )
-
-  if (isVisiblePaywallDialog && !isEntitled) {
-    val offering = (uiState as? DetailUiState.Success)?.offering ?: return
-    PaywallDialog(
-      PaywallDialogOptions.Builder()
-        .setDismissRequest { isVisiblePaywallDialog = false }
-        .setOffering(offering)
-        .build(),
-    )
-  }
-
-  RememberedEffect(isVisiblePaywallDialog) {
-    val window = (context as Activity).window
-    window.statusBarColor = if (isVisiblePaywallDialog) {
-      Color.Black.toArgb()
-    } else {
-      Color.Transparent.toArgb()
-    }
-  }
 }
 
 @Composable
@@ -327,15 +286,6 @@ private fun CatArticlesDetailContentPreview() {
         Column(modifier = Modifier.fillMaxSize()) {
           CatArticlesDetailContent(
             article = mockArticle,
-            uiState = DetailUiState.Success(
-              Offering(
-                identifier = "",
-                serverDescription = "",
-                metadata = mapOf(),
-                availablePackages = listOf(),
-              ),
-            ),
-            customerInfo = null,
             animatedVisibilityScope = this@AnimatedVisibility,
             navigateUp = {},
           )

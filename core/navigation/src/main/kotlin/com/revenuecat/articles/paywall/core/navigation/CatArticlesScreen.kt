@@ -25,6 +25,9 @@ sealed interface CatArticlesScreen {
   data object CatHome : CatArticlesScreen
 
   @Serializable
+  data object Paywalls : CatArticlesScreen
+
+  @Serializable
   data class CatArticle(val article: Article) : CatArticlesScreen {
     companion object {
       val typeMap = mapOf(typeOf<Article>() to CatArticlesType)

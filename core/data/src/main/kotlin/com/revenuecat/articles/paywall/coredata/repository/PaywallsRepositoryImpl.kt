@@ -15,14 +15,18 @@
  */
 package com.revenuecat.articles.paywall.coredata.repository
 
+import android.app.Activity
 import com.revenuecat.articles.paywall.core.network.CatArticlesDispatchers
 import com.revenuecat.articles.paywall.core.network.Dispatcher
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offering
+import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesException
 import com.revenuecat.purchases.awaitCustomerInfo
 import com.revenuecat.purchases.awaitOfferings
+import com.revenuecat.purchases.awaitPurchase
 import com.skydoves.sandwich.ApiResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -30,9 +34,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-internal class DetailsRepositoryImpl @Inject constructor(
+internal class PaywallsRepositoryImpl @Inject constructor(
   @Dispatcher(CatArticlesDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
-) : DetailsRepository {
+) : PaywallsRepository {
 
   override fun fetchOffering(): Flow<ApiResponse<Offering>> = flow {
     try {
@@ -52,6 +56,20 @@ internal class DetailsRepositoryImpl @Inject constructor(
       emit(customerInfo)
     } catch (e: PurchasesException) {
       emit(null)
+    }
+  }
+
+  override fun awaitPurchases(activity: Activity, availablePackage: Package) = flow {
+    try {
+      val result = Purchases.sharedInstance.awaitPurchase(
+        purchaseParams = PurchaseParams.Builder(
+          activity = activity,
+          packageToPurchase = availablePackage,
+        ).build(),
+      )
+      emit(ApiResponse.of { result })
+    } catch (e: Exception) {
+      emit(ApiResponse.exception(e))
     }
   }
 }

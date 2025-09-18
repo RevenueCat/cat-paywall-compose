@@ -15,61 +15,37 @@
  */
 package com.revenuecat.articles.paywall.feature.article
 
-import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revenuecat.articles.paywall.core.model.Article
 import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
-import com.revenuecat.articles.paywall.coredata.repository.DetailsRepository
-import com.revenuecat.purchases.Offering
-import com.skydoves.sandwich.fold
+import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
 class CatArticlesDetailViewModel @Inject constructor(
-  repository: DetailsRepository,
+  repository: PaywallsRepository,
   private val navigator: AppComposeNavigator<CatArticlesScreen>,
   savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
   val article = savedStateHandle.getStateFlow<Article?>("article", null)
-
   val customerInfo = repository.fetchCustomerInfo().stateIn(
     scope = viewModelScope,
     started = SharingStarted.WhileSubscribed(5000),
     initialValue = null,
   )
 
-  val uiState: StateFlow<DetailUiState> = repository.fetchOffering()
-    .mapLatest { response ->
-      response.fold(
-        onSuccess = { DetailUiState.Success(it) },
-        onFailure = { DetailUiState.Error(it) },
-      )
-    }.stateIn(
-      scope = viewModelScope,
-      started = SharingStarted.WhileSubscribed(5000),
-      initialValue = DetailUiState.Loading,
-    )
+  fun navigateToCustomPaywalls() {
+    navigator.navigate(CatArticlesScreen.Paywalls)
+  }
 
   fun navigateUp() {
     navigator.navigateUp()
   }
-}
-
-@Stable
-sealed interface DetailUiState {
-
-  data object Loading : DetailUiState
-
-  data class Success(val offering: Offering) : DetailUiState
-
-  data class Error(val message: String?) : DetailUiState
 }
