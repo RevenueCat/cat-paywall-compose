@@ -66,6 +66,7 @@ Cat Paywall Compose is built using the [RevenueCat SDK for Android](https://www.
   - [Hilt](https://dagger.dev/hilt/): Dependency Injection.
 - [Retrofit2 & OkHttp3](https://github.com/square/retrofit): Construct the REST APIs and paging network data.
 - [Sandwich](https://github.com/skydoves/Sandwich): Construct a lightweight and modern response interface to handle network payload for Android.
+- [Slide to Unlock](https://github.com/revenueCat/slide-to-unlock/): Fully customizable slide to unlock UI component for Jetpack Compose and KMP.
 - [Baseline Profiles](https://medium.com/proandroiddev/improve-your-android-app-performance-with-baseline-profiles-297f388082e6): To improve app performance by including a list of classes and methods specifications in your APK that can be used by Android Runtime.
 
 ## 💻 How to Build The Project
