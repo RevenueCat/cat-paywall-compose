@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.feature.article.CatArticlesDetail
 import com.revenuecat.articles.paywall.feature.home.CatArticlesHome
+import com.revenuecat.articles.paywall.paywalls.CatCustomPaywalls
 
 fun NavGraphBuilder.catArticlesNavigation(sharedTransitionScope: SharedTransitionScope) {
   with(sharedTransitionScope) {
@@ -32,6 +33,10 @@ fun NavGraphBuilder.catArticlesNavigation(sharedTransitionScope: SharedTransitio
       typeMap = CatArticlesScreen.CatArticle.typeMap,
     ) {
       CatArticlesDetail(animatedVisibilityScope = this)
+    }
+
+    composable<CatArticlesScreen.Paywalls> {
+      CatCustomPaywalls()
     }
   }
 }

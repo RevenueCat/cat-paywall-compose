@@ -30,9 +30,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-internal class DetailsRepositoryImpl @Inject constructor(
+internal class PaywallsRepositoryImpl @Inject constructor(
   @Dispatcher(CatArticlesDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
-) : DetailsRepository {
+) : PaywallsRepository {
 
   override fun fetchOffering(): Flow<ApiResponse<Offering>> = flow {
     try {

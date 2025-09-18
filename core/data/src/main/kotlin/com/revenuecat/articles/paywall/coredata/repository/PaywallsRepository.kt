@@ -20,7 +20,7 @@ import com.revenuecat.purchases.Offering
 import com.skydoves.sandwich.ApiResponse
 import kotlinx.coroutines.flow.Flow
 
-interface DetailsRepository {
+interface PaywallsRepository {
 
   fun fetchOffering(): Flow<ApiResponse<Offering>>
 
