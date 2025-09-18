@@ -15,8 +15,11 @@
  */
 package com.revenuecat.articles.paywall.coredata.repository
 
+import android.app.Activity
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offering
+import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.PurchaseResult
 import com.skydoves.sandwich.ApiResponse
 import kotlinx.coroutines.flow.Flow
 
@@ -25,4 +28,9 @@ interface PaywallsRepository {
   fun fetchOffering(): Flow<ApiResponse<Offering>>
 
   fun fetchCustomerInfo(): Flow<CustomerInfo?>
+
+  fun awaitPurchases(
+    activity: Activity,
+    availablePackage: Package,
+  ): Flow<ApiResponse<PurchaseResult>>
 }
