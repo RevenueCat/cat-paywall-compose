@@ -15,7 +15,7 @@
  */
 @file:OptIn(InternalRevenueCatAPI::class)
 
-package com.revenuecat.articles.paywal.feature.article
+package com.revenuecat.articles.paywall.feature.article
 
 import android.app.Activity
 import android.widget.Toast

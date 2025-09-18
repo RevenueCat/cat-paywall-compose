@@ -18,8 +18,8 @@ package com.revenuecat.articles.paywall.compose.navigation
 import androidx.compose.animation.SharedTransitionScope
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.revenuecat.articles.paywal.feature.article.CatArticlesDetail
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
+import com.revenuecat.articles.paywall.feature.article.CatArticlesDetail
 import com.revenuecat.articles.paywall.feature.home.CatArticlesHome
 
 fun NavGraphBuilder.catArticlesNavigation(sharedTransitionScope: SharedTransitionScope) {
