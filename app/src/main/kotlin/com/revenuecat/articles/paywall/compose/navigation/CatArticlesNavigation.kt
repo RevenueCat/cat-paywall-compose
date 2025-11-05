@@ -19,8 +19,10 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
+import com.revenuecat.articles.paywall.feature.account.AccountScreen
 import com.revenuecat.articles.paywall.feature.article.CatArticlesDetail
 import com.revenuecat.articles.paywall.feature.home.CatArticlesHome
+import com.revenuecat.articles.paywall.feature.subscriptions.SubscriptionManagementScreen
 import com.revenuecat.articles.paywall.paywalls.CatCustomPaywalls
 
 fun NavGraphBuilder.catArticlesNavigation(sharedTransitionScope: SharedTransitionScope) {
@@ -37,6 +39,14 @@ fun NavGraphBuilder.catArticlesNavigation(sharedTransitionScope: SharedTransitio
 
     composable<CatArticlesScreen.Paywalls> {
       CatCustomPaywalls()
+    }
+
+    composable<CatArticlesScreen.Account> {
+      AccountScreen()
+    }
+
+    composable<CatArticlesScreen.SubscriptionManagement> {
+      SubscriptionManagementScreen()
     }
   }
 }

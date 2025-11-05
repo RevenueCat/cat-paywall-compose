@@ -33,4 +33,10 @@ sealed interface CatArticlesScreen {
       val typeMap = mapOf(typeOf<Article>() to CatArticlesType)
     }
   }
+
+  @Serializable
+  data object Account : CatArticlesScreen
+
+  @Serializable
+  data object SubscriptionManagement : CatArticlesScreen
 }
