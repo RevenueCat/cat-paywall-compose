@@ -50,14 +50,14 @@ internal class PaywallsRepositoryImpl @Inject constructor(
     }
   }.flowOn(ioDispatcher)
 
-  override fun fetchCustomerInfo(): Flow<CustomerInfo?> = flow {
+  override fun fetchCustomerInfo(): Flow<ApiResponse<CustomerInfo?>> = flow {
     try {
       val customerInfo = Purchases.sharedInstance.awaitCustomerInfo()
-      emit(customerInfo)
+      emit(ApiResponse.of { customerInfo })
     } catch (e: PurchasesException) {
-      emit(null)
+      emit(ApiResponse.exception(e))
     }
-  }
+  }.flowOn(ioDispatcher)
 
   override fun awaitPurchases(activity: Activity, availablePackage: Package) = flow {
     try {

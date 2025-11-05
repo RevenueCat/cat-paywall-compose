@@ -34,6 +34,7 @@ fun CatArticlesAppBar(
   modifier: Modifier = Modifier,
   title: String = stringResource(id = R.string.app_name),
   navigationIcon: @Composable () -> Unit = {},
+  actions: @Composable () -> Unit = {},
 ) {
   TopAppBar(
     modifier = modifier,
@@ -46,6 +47,7 @@ fun CatArticlesAppBar(
       )
     },
     navigationIcon = navigationIcon,
+    actions = { actions() },
     colors = TopAppBarDefaults.topAppBarColors().copy(
       containerColor = Color.Transparent,
     ),

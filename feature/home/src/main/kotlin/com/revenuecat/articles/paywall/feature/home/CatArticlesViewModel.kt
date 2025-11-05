@@ -51,6 +51,10 @@ class CatArticlesViewModel @Inject constructor(
   fun navigateToDetails(article: Article) {
     navigator.navigate(CatArticlesScreen.CatArticle(article))
   }
+
+  fun navigateToAccount() {
+    navigator.navigate(CatArticlesScreen.Account)
+  }
 }
 
 @Stable

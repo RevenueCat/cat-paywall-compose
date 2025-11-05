@@ -22,8 +22,10 @@ import com.revenuecat.articles.paywall.core.model.Article
 import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
+import com.skydoves.sandwich.fold
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -35,11 +37,18 @@ class CatArticlesDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
   val article = savedStateHandle.getStateFlow<Article?>("article", null)
-  val customerInfo = repository.fetchCustomerInfo().stateIn(
-    scope = viewModelScope,
-    started = SharingStarted.WhileSubscribed(5000),
-    initialValue = null,
-  )
+  val customerInfo = repository.fetchCustomerInfo()
+    .map { response ->
+      response.fold(
+        onSuccess = { it },
+        onFailure = { null },
+      )
+    }
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5000),
+      initialValue = null,
+    )
 
   fun navigateToCustomPaywalls() {
     navigator.navigate(CatArticlesScreen.Paywalls)

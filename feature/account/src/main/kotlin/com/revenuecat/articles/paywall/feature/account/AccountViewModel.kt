@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revenuecat.articles.paywall.coredata.repository
+package com.revenuecat.articles.paywall.feature.account
 
-import android.app.Activity
-import com.revenuecat.purchases.CustomerInfo
-import com.revenuecat.purchases.Offering
-import com.revenuecat.purchases.Package
-import com.revenuecat.purchases.PurchaseResult
-import com.skydoves.sandwich.ApiResponse
-import kotlinx.coroutines.flow.Flow
+import androidx.lifecycle.ViewModel
+import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
+import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-interface PaywallsRepository {
+@HiltViewModel
+class AccountViewModel @Inject constructor(
+  private val navigator: AppComposeNavigator<CatArticlesScreen>,
+) : ViewModel() {
 
-  fun fetchOffering(): Flow<ApiResponse<Offering>>
-
-  fun fetchCustomerInfo(): Flow<ApiResponse<CustomerInfo?>>
-
-  fun awaitPurchases(
-    activity: Activity,
-    availablePackage: Package,
-  ): Flow<ApiResponse<PurchaseResult>>
+  fun navigateUp() {
+    navigator.navigateUp()
+  }
 }

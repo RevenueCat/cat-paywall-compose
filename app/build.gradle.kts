@@ -66,6 +66,8 @@ dependencies {
   implementation(projects.feature.home)
   implementation(projects.feature.article)
   implementation(projects.feature.paywalls)
+  implementation(projects.feature.account)
+  implementation(projects.feature.subscriptions)
 
   // RevenueCat
   implementation(libs.revenuecat)

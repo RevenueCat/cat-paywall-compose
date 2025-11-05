@@ -32,6 +32,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -72,7 +76,18 @@ fun SharedTransitionScope.CatArticlesHome(
   val uiState by catArticlesViewModel.uiState.collectAsStateWithLifecycle()
 
   Column(modifier = Modifier.fillMaxSize()) {
-    CatArticlesAppBar(modifier = Modifier.background(CatArticlesTheme.colors.primary))
+    CatArticlesAppBar(
+      modifier = Modifier.background(CatArticlesTheme.colors.primary),
+      actions = {
+        IconButton(onClick = { catArticlesViewModel.navigateToAccount() }) {
+          Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = "Account",
+            tint = Color.White,
+          )
+        }
+      },
+    )
 
     HomeContent(
       uiState = uiState,
