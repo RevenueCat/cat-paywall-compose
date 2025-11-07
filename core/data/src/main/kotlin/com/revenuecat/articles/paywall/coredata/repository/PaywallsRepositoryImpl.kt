@@ -16,6 +16,7 @@
 package com.revenuecat.articles.paywall.coredata.repository
 
 import android.app.Activity
+import androidx.annotation.VisibleForTesting
 import com.revenuecat.articles.paywall.core.network.CatArticlesDispatchers
 import com.revenuecat.articles.paywall.core.network.Dispatcher
 import com.revenuecat.purchases.CustomerInfo
@@ -34,7 +35,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-internal class PaywallsRepositoryImpl @Inject constructor(
+@VisibleForTesting
+public class PaywallsRepositoryImpl @Inject constructor(
   @Dispatcher(CatArticlesDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : PaywallsRepository {
 
@@ -44,9 +46,11 @@ internal class PaywallsRepositoryImpl @Inject constructor(
       offerings.current?.let { currentOffering ->
         val response = ApiResponse.of { currentOffering }
         emit(response)
+      } ?: run {
+        emit(ApiResponse.exception(IllegalStateException("No current offering available")))
       }
     } catch (e: PurchasesException) {
-      ApiResponse.exception(e)
+      emit(ApiResponse.exception(e))
     }
   }.flowOn(ioDispatcher)
 

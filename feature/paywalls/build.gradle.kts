@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import java.util.Properties
+
 plugins {
   id("revenuecat.android.library")
   id("revenuecat.android.library.compose")
@@ -21,8 +23,29 @@ plugins {
   id("revenuecat.spotless")
 }
 
+// Load local.properties
+val localProperties = Properties().apply {
+  val localPropertiesFile = rootProject.file("local.properties")
+  if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { load(it) }
+  }
+}
+
 android {
   namespace = "com.revenuecat.articles.paywall.compose.feature.paywalls"
+
+  buildFeatures {
+    buildConfig = true
+  }
+
+  defaultConfig {
+    // Add RevenueCat Test Store API key to BuildConfig for unit tests
+    buildConfigField(
+      "String",
+      "REVENUECAT_TEST_API_KEY",
+      "\"${localProperties.getProperty("revenuecat.test.api.key", "")}\""
+    )
+  }
 }
 
 dependencies {
@@ -36,4 +59,11 @@ dependencies {
   implementation(libs.androidx.compose.material)
   implementation(libs.androidx.compose.runtime)
   implementation(libs.compose.slidetounlock)
+
+  // Testing
+  testImplementation(libs.junit)
+  testImplementation(libs.mockk)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.turbine)
+  testImplementation(projects.core.data) // Required for repository
 }
