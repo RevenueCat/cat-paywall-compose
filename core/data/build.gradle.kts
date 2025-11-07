@@ -78,6 +78,7 @@ dependencies {
   androidTestImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.espresso.core)
   androidTestImplementation(libs.kotlinx.coroutines.test)
   androidTestImplementation(libs.turbine)
   androidTestImplementation(libs.revenuecat) // Required for RevenueCat SDK
