@@ -17,8 +17,6 @@ package com.revenuecat.articles.paywall.paywalls
 
 import android.app.Activity
 import app.cash.turbine.test
-import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
-import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.Package
@@ -26,7 +24,6 @@ import com.revenuecat.purchases.PurchaseResult
 import com.skydoves.sandwich.ApiResponse
 import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -68,7 +65,6 @@ class CustomCatPaywallsViewModelTest {
 
   // Mock dependencies
   private val mockRepository: PaywallsRepository = mockk(relaxed = true)
-  private val mockNavigator: AppComposeNavigator<CatArticlesScreen> = mockk(relaxed = true)
   private val mockOffering: Offering = mockk(relaxed = true)
   private val mockPackage: Package = mockk(relaxed = true)
   private val mockActivity: Activity = mockk(relaxed = true)
@@ -92,7 +88,7 @@ class CustomCatPaywallsViewModelTest {
     coEvery { mockRepository.fetchOffering() } returns flowOf()
 
     // When
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     assertEquals(PaywallsUiState.Loading, viewModel.uiState.value)
@@ -107,7 +103,7 @@ class CustomCatPaywallsViewModelTest {
     coEvery { mockRepository.fetchOffering() } returns flowOf(successResponse)
 
     // When
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -132,7 +128,7 @@ class CustomCatPaywallsViewModelTest {
     coEvery { mockRepository.fetchOffering() } returns flowOf(errorResponse)
 
     // When
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -157,7 +153,7 @@ class CustomCatPaywallsViewModelTest {
     coEvery { mockRepository.fetchOffering() } returns flowOf(errorResponse)
 
     // When
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -182,7 +178,7 @@ class CustomCatPaywallsViewModelTest {
     coEvery { mockRepository.fetchOffering() } returns flowOf()
 
     // When
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     assertEquals(PurchaseUiState.None, viewModel.purchaseUiState.value)
@@ -192,7 +188,7 @@ class CustomCatPaywallsViewModelTest {
   fun `purchaseUiState should remain None when None event is handled`() = runTest(testDispatcher) {
     // Given
     coEvery { mockRepository.fetchOffering() } returns flowOf()
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // When
     viewModel.handleEvent(PaywallEvent.None)
@@ -216,7 +212,7 @@ class CustomCatPaywallsViewModelTest {
       mockRepository.awaitPurchases(mockActivity, mockPackage)
     } returns flowOf(successResponse)
 
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     viewModel.purchaseUiState.test {
@@ -244,7 +240,7 @@ class CustomCatPaywallsViewModelTest {
       mockRepository.awaitPurchases(mockActivity, mockPackage)
     } returns flowOf(errorResponse)
 
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     viewModel.purchaseUiState.test {
@@ -272,7 +268,7 @@ class CustomCatPaywallsViewModelTest {
       mockRepository.awaitPurchases(mockActivity, mockPackage)
     } returns flowOf(errorResponse)
 
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     viewModel.purchaseUiState.test {
@@ -300,7 +296,7 @@ class CustomCatPaywallsViewModelTest {
       mockRepository.awaitPurchases(mockActivity, mockPackage)
     } returns flowOf(errorResponse)
 
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // Then
     viewModel.purchaseUiState.test {
@@ -324,7 +320,7 @@ class CustomCatPaywallsViewModelTest {
   fun `handleEvent should emit event to SharedFlow`() = runTest(testDispatcher) {
     // Given
     coEvery { mockRepository.fetchOffering() } returns flowOf()
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // When
     val purchaseEvent = PaywallEvent.Purchases(mockActivity, mockPackage)
@@ -347,7 +343,7 @@ class CustomCatPaywallsViewModelTest {
       mockRepository.awaitPurchases(any(), any())
     } returns flowOf(ApiResponse.Success(mockPurchaseResult))
 
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
+    viewModel = CustomCatPaywallsViewModel(mockRepository)
 
     // When
     viewModel.handleEvent(PaywallEvent.Purchases(mockActivity, mockPackage))
@@ -357,20 +353,5 @@ class CustomCatPaywallsViewModelTest {
     coEvery {
       mockRepository.awaitPurchases(mockActivity, mockPackage)
     }
-  }
-
-  // ========== navigateUp Tests ==========
-
-  @Test
-  fun `navigateUp should call navigator navigateUp`() = runTest(testDispatcher) {
-    // Given
-    coEvery { mockRepository.fetchOffering() } returns flowOf()
-    viewModel = CustomCatPaywallsViewModel(mockRepository, mockNavigator)
-
-    // When
-    viewModel.navigateUp()
-
-    // Then
-    verify(exactly = 1) { mockNavigator.navigateUp() }
   }
 }

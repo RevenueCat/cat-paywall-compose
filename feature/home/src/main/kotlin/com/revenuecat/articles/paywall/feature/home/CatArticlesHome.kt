@@ -15,9 +15,7 @@
  */
 package com.revenuecat.articles.paywall.feature.home
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,7 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.revenuecat.articles.paywall.compose.core.designsystem.R
 import com.revenuecat.articles.paywall.core.designsystem.component.CatArticlesAppBar
@@ -61,7 +59,9 @@ import com.revenuecat.articles.paywall.core.designsystem.component.catArticlesSh
 import com.revenuecat.articles.paywall.core.designsystem.theme.CatArticlesTheme
 import com.revenuecat.articles.paywall.core.model.Article
 import com.revenuecat.articles.paywall.core.model.MockUtils.mockArticle
+import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.core.navigation.boundsTransform
+import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.glide.GlideImage
@@ -69,17 +69,19 @@ import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @Composable
-fun SharedTransitionScope.CatArticlesHome(
-  animatedVisibilityScope: AnimatedVisibilityScope,
+fun CatArticlesHome(
+  sharedTransitionScope: SharedTransitionScope,
+  animatedContentScope: AnimatedContentScope,
   catArticlesViewModel: CatArticlesViewModel = hiltViewModel(),
 ) {
   val uiState by catArticlesViewModel.uiState.collectAsStateWithLifecycle()
+  val composeNavigator = currentComposeNavigator
 
   Column(modifier = Modifier.fillMaxSize()) {
     CatArticlesAppBar(
       modifier = Modifier.background(CatArticlesTheme.colors.primary),
       actions = {
-        IconButton(onClick = { catArticlesViewModel.navigateToAccount() }) {
+        IconButton(onClick = { composeNavigator.navigate(CatArticlesScreen.Account) }) {
           Icon(
             imageVector = Icons.Default.AccountCircle,
             contentDescription = "Account",
@@ -91,16 +93,18 @@ fun SharedTransitionScope.CatArticlesHome(
 
     HomeContent(
       uiState = uiState,
-      animatedVisibilityScope = animatedVisibilityScope,
-      onNavigateToDetails = { catArticlesViewModel.navigateToDetails(it) },
+      sharedTransitionScope = sharedTransitionScope,
+      animatedContentScope = animatedContentScope,
+      onNavigateToDetails = { composeNavigator.navigate(CatArticlesScreen.CatArticle(it)) },
     )
   }
 }
 
 @Composable
-private fun SharedTransitionScope.HomeContent(
+private fun HomeContent(
   uiState: HomeUiState,
-  animatedVisibilityScope: AnimatedVisibilityScope,
+  sharedTransitionScope: SharedTransitionScope,
+  animatedContentScope: AnimatedContentScope,
   onNavigateToDetails: (Article) -> Unit,
 ) {
   Box(modifier = Modifier.fillMaxSize()) {
@@ -115,7 +119,8 @@ private fun SharedTransitionScope.HomeContent(
         items(items = uiState.articles, key = { it.title }) { article ->
           ArticleCard(
             article = article,
-            animatedVisibilityScope = animatedVisibilityScope,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
             onNavigateToDetails = onNavigateToDetails,
           )
         }
@@ -125,55 +130,58 @@ private fun SharedTransitionScope.HomeContent(
 }
 
 @Composable
-private fun SharedTransitionScope.ArticleCard(
+private fun ArticleCard(
   article: Article,
-  animatedVisibilityScope: AnimatedVisibilityScope,
+  sharedTransitionScope: SharedTransitionScope,
+  animatedContentScope: AnimatedContentScope,
   onNavigateToDetails: (Article) -> Unit,
 ) {
-  Box(
-    modifier = Modifier
-      .testTag("Article")
-      .padding(8.dp)
-      .fillMaxWidth()
-      .height(300.dp)
-      .clip(RoundedCornerShape(6.dp))
-      .clickable { onNavigateToDetails.invoke(article) }
-      .catArticlesSharedElement(
-        isLocalInspectionMode = LocalInspectionMode.current,
-        state = rememberSharedContentState(key = "article-${article.title}"),
-        animatedVisibilityScope = animatedVisibilityScope,
-        boundsTransform = boundsTransform,
-      ),
-  ) {
-    GlideImage(
-      modifier = Modifier.fillMaxSize(),
-      imageModel = { article.cover },
-      imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-      component = rememberImageComponent {
-        +ShimmerPlugin(
-          Shimmer.Resonate(
-            baseColor = Color.Transparent,
-            highlightColor = Color.LightGray,
-          ),
-        )
-      },
-      previewPlaceholder = painterResource(
-        id = R.drawable.placeholder,
-      ),
-    )
-
-    Text(
+  with(sharedTransitionScope) {
+    Box(
       modifier = Modifier
+        .testTag("Article")
+        .padding(8.dp)
         .fillMaxWidth()
-        .align(Alignment.BottomCenter)
-        .background(Color.Black.copy(alpha = 0.65f))
-        .padding(12.dp),
-      text = article.title,
-      color = Color.White,
-      textAlign = TextAlign.Center,
-      fontSize = 14.sp,
-      fontWeight = FontWeight.Bold,
-    )
+        .height(300.dp)
+        .clip(RoundedCornerShape(6.dp))
+        .clickable { onNavigateToDetails.invoke(article) }
+        .catArticlesSharedElement(
+          isLocalInspectionMode = LocalInspectionMode.current,
+          state = rememberSharedContentState(key = "article-${article.title}"),
+          animatedVisibilityScope = animatedContentScope,
+          boundsTransform = boundsTransform,
+        ),
+    ) {
+      GlideImage(
+        modifier = Modifier.fillMaxSize(),
+        imageModel = { article.cover },
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+        component = rememberImageComponent {
+          +ShimmerPlugin(
+            Shimmer.Resonate(
+              baseColor = Color.Transparent,
+              highlightColor = Color.LightGray,
+            ),
+          )
+        },
+        previewPlaceholder = painterResource(
+          id = R.drawable.placeholder,
+        ),
+      )
+
+      Text(
+        modifier = Modifier
+          .fillMaxWidth()
+          .align(Alignment.BottomCenter)
+          .background(Color.Black.copy(alpha = 0.65f))
+          .padding(12.dp),
+        text = article.title,
+        color = Color.White,
+        textAlign = TextAlign.Center,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+      )
+    }
   }
 }
 
@@ -181,29 +189,46 @@ private fun SharedTransitionScope.ArticleCard(
 @Composable
 private fun HomeContentPreview() {
   CatArticlesTheme {
-    SharedTransitionLayout {
-      AnimatedVisibility(visible = true, label = "") {
-        HomeContent(
-          uiState = HomeUiState.Success(List(10) { mockArticle }),
-          animatedVisibilityScope = this,
-          onNavigateToDetails = {},
-        )
-      }
-    }
+    HomeContentPreviewContent()
   }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun ArticleCardPreview() {
-  CatArticlesTheme {
-    SharedTransitionLayout {
-      AnimatedVisibility(visible = true, label = "") {
-        ArticleCard(
-          article = mockArticle,
-          animatedVisibilityScope = this,
-          onNavigateToDetails = {},
-        )
+private fun HomeContentPreviewContent() {
+  // Preview without shared element transitions
+  Box(modifier = Modifier.fillMaxSize()) {
+    LazyVerticalGrid(
+      columns = GridCells.Fixed(2),
+      contentPadding = PaddingValues(6.dp),
+    ) {
+      items(items = List(10) { mockArticle }, key = { "${it.title}-$it" }) { article ->
+        Box(
+          modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .height(300.dp)
+            .clip(RoundedCornerShape(6.dp)),
+        ) {
+          GlideImage(
+            modifier = Modifier.fillMaxSize(),
+            imageModel = { article.cover },
+            imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+            previewPlaceholder = painterResource(id = R.drawable.placeholder),
+          )
+
+          Text(
+            modifier = Modifier
+              .fillMaxWidth()
+              .align(Alignment.BottomCenter)
+              .background(Color.Black.copy(alpha = 0.65f))
+              .padding(12.dp),
+            text = article.title,
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+          )
+        }
       }
     }
   }

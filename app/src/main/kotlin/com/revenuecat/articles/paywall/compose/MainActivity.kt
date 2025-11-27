@@ -20,23 +20,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.revenuecat.articles.paywall.compose.ui.CatArticlesMain
-import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
-import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-  @Inject
-  internal lateinit var composeNavigator: AppComposeNavigator<CatArticlesScreen>
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
 
     setContent {
-      CatArticlesMain(composeNavigator = composeNavigator)
+      CatArticlesMain()
     }
   }
 }

@@ -16,7 +16,6 @@
 plugins {
   id("revenuecat.android.library")
   id("revenuecat.android.library.compose")
-  id("revenuecat.android.hilt")
   id("org.jetbrains.kotlin.plugin.serialization")
   id("revenuecat.spotless")
 }
@@ -28,6 +27,10 @@ android {
 dependencies {
   implementation(projects.core.model)
 
-  implementation(libs.kotlinx.coroutines.android)
-  api(libs.androidx.navigation.compose)
+  // Navigation3
+  api(libs.androidx.navigation3.runtime)
+  api(libs.androidx.navigation3.ui)
+
+  // json parsing
+  implementation(libs.kotlinx.serialization.json)
 }

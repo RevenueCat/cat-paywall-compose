@@ -16,22 +16,17 @@
 package com.revenuecat.articles.paywall.feature.subscriptions
 
 import app.cash.turbine.test
-import com.revenuecat.articles.paywall.compose.feature.subscriptions.BuildConfig
 import com.revenuecat.articles.paywall.feature.subscriptions.SubscriptionManagementUiState as UiState
-import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
-import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offering
 import com.skydoves.sandwich.ApiResponse
 import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -68,7 +63,6 @@ class SubscriptionManagementViewModelTest {
 
   // Mock dependencies
   private val mockRepository: PaywallsRepository = mockk(relaxed = true)
-  private val mockNavigator: AppComposeNavigator<CatArticlesScreen> = mockk(relaxed = true)
   private val mockOffering: Offering = mockk(relaxed = true)
   private val mockCustomerInfo: CustomerInfo = mockk(relaxed = true)
 
@@ -91,11 +85,7 @@ class SubscriptionManagementViewModelTest {
     coEvery { mockRepository.fetchCustomerInfo() } returns flowOf()
 
     // When
-    viewModel =
-      SubscriptionManagementViewModel(
-        mockRepository,
-        mockNavigator,
-      )
+    viewModel = SubscriptionManagementViewModel(mockRepository)
 
     // Then
     assertEquals(
@@ -113,7 +103,7 @@ class SubscriptionManagementViewModelTest {
     coEvery { mockRepository.fetchCustomerInfo() } returns flowOf(customerInfoResponse)
 
     // When
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
+    viewModel = SubscriptionManagementViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -141,7 +131,7 @@ class SubscriptionManagementViewModelTest {
     coEvery { mockRepository.fetchCustomerInfo() } returns flowOf(customerInfoResponse)
 
     // When
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
+    viewModel = SubscriptionManagementViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -168,7 +158,7 @@ class SubscriptionManagementViewModelTest {
     coEvery { mockRepository.fetchCustomerInfo() } returns flowOf(customerInfoResponse)
 
     // When
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
+    viewModel = SubscriptionManagementViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -194,7 +184,7 @@ class SubscriptionManagementViewModelTest {
     coEvery { mockRepository.fetchCustomerInfo() } returns flowOf(customerInfoResponse)
 
     // When
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
+    viewModel = SubscriptionManagementViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -222,7 +212,7 @@ class SubscriptionManagementViewModelTest {
     coEvery { mockRepository.fetchCustomerInfo() } returns flowOf(customerInfoResponse)
 
     // When
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
+    viewModel = SubscriptionManagementViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -249,7 +239,7 @@ class SubscriptionManagementViewModelTest {
     coEvery { mockRepository.fetchCustomerInfo() } returns flowOf(customerInfoResponse)
 
     // When
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
+    viewModel = SubscriptionManagementViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -276,7 +266,7 @@ class SubscriptionManagementViewModelTest {
     coEvery { mockRepository.fetchCustomerInfo() } returns flowOf(customerInfoResponse)
 
     // When
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
+    viewModel = SubscriptionManagementViewModel(mockRepository)
 
     // Then
     viewModel.uiState.test {
@@ -291,52 +281,5 @@ class SubscriptionManagementViewModelTest {
       assertTrue(state is UiState.Error)
       assertTrue((state as UiState.Error).message.contains(errorMessage))
     }
-  }
-  // ========== navigateUp Tests ==========
-
-  @Test
-  fun `navigateUp should call navigator navigateUp`() = runTest(testDispatcher) {
-    // Given
-    coEvery { mockRepository.fetchOffering() } returns flowOf()
-    coEvery { mockRepository.fetchCustomerInfo() } returns flowOf()
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
-
-    // When
-    viewModel.navigateUp()
-
-    // Then
-    verify(exactly = 1) { mockNavigator.navigateUp() }
-  }
-
-  // ========== navigateToPaywall Tests ==========
-
-  @Test
-  fun `navigateToPaywall should navigate to Paywalls screen`() = runTest(testDispatcher) {
-    // Given
-    coEvery { mockRepository.fetchOffering() } returns flowOf()
-    coEvery { mockRepository.fetchCustomerInfo() } returns flowOf()
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
-
-    // When
-    viewModel.navigateToPaywall()
-
-    // Then
-    verify(exactly = 1) { mockNavigator.navigate(CatArticlesScreen.Paywalls) }
-  }
-
-  @Test
-  fun `navigateToPaywall should be callable multiple times`() = runTest(testDispatcher) {
-    // Given
-    coEvery { mockRepository.fetchOffering() } returns flowOf()
-    coEvery { mockRepository.fetchCustomerInfo() } returns flowOf()
-    viewModel = SubscriptionManagementViewModel(mockRepository, mockNavigator)
-
-    // When
-    viewModel.navigateToPaywall()
-    viewModel.navigateToPaywall()
-    viewModel.navigateToPaywall()
-
-    // Then
-    verify(exactly = 3) { mockNavigator.navigate(CatArticlesScreen.Paywalls) }
   }
 }

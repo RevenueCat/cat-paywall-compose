@@ -15,20 +15,69 @@
  */
 package com.revenuecat.articles.paywall.compose.navigation
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import androidx.navigation3.ui.NavDisplay
+import com.revenuecat.articles.paywall.core.navigation.CatArticlesNavigatorImpl
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
+import com.revenuecat.articles.paywall.core.navigation.LocalComposeNavigator
+import com.revenuecat.articles.paywall.feature.account.AccountScreen
+import com.revenuecat.articles.paywall.feature.article.CatArticlesDetail
+import com.revenuecat.articles.paywall.feature.home.CatArticlesHome
+import com.revenuecat.articles.paywall.feature.subscriptions.SubscriptionManagementScreen
+import com.revenuecat.articles.paywall.paywalls.CatCustomPaywalls
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun CatArticlesNavHost(navHostController: NavHostController) {
-  SharedTransitionLayout {
-    NavHost(
-      navController = navHostController,
-      startDestination = CatArticlesScreen.CatHome,
-    ) {
-      catArticlesNavigation(this@SharedTransitionLayout)
+fun CatArticlesNavHost() {
+  val backStack = rememberNavBackStack(CatArticlesScreen.CatHome)
+  val navigator = remember(backStack) { CatArticlesNavigatorImpl(backStack) }
+
+  CompositionLocalProvider(
+    LocalComposeNavigator provides navigator,
+  ) {
+    SharedTransitionLayout {
+      NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator()),
+        entryProvider = entryProvider<NavKey> {
+          entry<CatArticlesScreen.CatHome> {
+            CatArticlesHome(
+              sharedTransitionScope = this@SharedTransitionLayout,
+              animatedContentScope = LocalNavAnimatedContentScope.current,
+            )
+          }
+
+          entry<CatArticlesScreen.CatArticle> { screen ->
+            CatArticlesDetail(
+              sharedTransitionScope = this@SharedTransitionLayout,
+              animatedContentScope = LocalNavAnimatedContentScope.current,
+              article = screen.article,
+            )
+          }
+
+          entry<CatArticlesScreen.Paywalls> {
+            CatCustomPaywalls()
+          }
+
+          entry<CatArticlesScreen.Account> {
+            AccountScreen()
+          }
+
+          entry<CatArticlesScreen.SubscriptionManagement> {
+            SubscriptionManagementScreen()
+          }
+        },
+      )
     }
   }
 }

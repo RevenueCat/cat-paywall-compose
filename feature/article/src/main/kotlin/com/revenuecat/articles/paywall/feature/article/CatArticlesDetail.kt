@@ -17,13 +17,10 @@
 
 package com.revenuecat.articles.paywall.feature.article
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,18 +50,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kmpalette.palette.graphics.Palette
 import com.revenuecat.articles.paywall.compose.core.designsystem.R
 import com.revenuecat.articles.paywall.core.designsystem.component.CatArticlesAppBar
-import com.revenuecat.articles.paywall.core.designsystem.component.CatArticlesCircularProgress
 import com.revenuecat.articles.paywall.core.designsystem.component.catArticlesSharedElement
 import com.revenuecat.articles.paywall.core.designsystem.component.fadingEdge
 import com.revenuecat.articles.paywall.core.designsystem.theme.CatArticlesTheme
 import com.revenuecat.articles.paywall.core.model.Article
 import com.revenuecat.articles.paywall.core.model.MockUtils.mockArticle
+import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.core.navigation.boundsTransform
+import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.revenuecat.purchases.InternalRevenueCatAPI
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
@@ -75,11 +73,13 @@ import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
 @Composable
-fun SharedTransitionScope.CatArticlesDetail(
-  animatedVisibilityScope: AnimatedVisibilityScope,
+fun CatArticlesDetail(
+  sharedTransitionScope: SharedTransitionScope,
+  animatedContentScope: AnimatedContentScope,
+  article: Article,
   viewModel: CatArticlesDetailViewModel = hiltViewModel(),
 ) {
-  val article by viewModel.article.collectAsStateWithLifecycle()
+  val composeNavigator = currentComposeNavigator
 
   Column(
     modifier = Modifier
@@ -87,27 +87,25 @@ fun SharedTransitionScope.CatArticlesDetail(
       .padding(bottom = 80.dp)
       .verticalScroll(state = rememberScrollState()),
   ) {
-    if (article == null) {
-      Box(modifier = Modifier.fillMaxSize()) {
-        CatArticlesCircularProgress()
-      }
-    } else {
-      CatArticlesDetailContent(
-        article = article!!,
-        viewModel = viewModel,
-        animatedVisibilityScope = animatedVisibilityScope,
-        navigateUp = { viewModel.navigateUp() },
-      )
-    }
+    CatArticlesDetailContent(
+      article = article,
+      viewModel = viewModel,
+      sharedTransitionScope = sharedTransitionScope,
+      animatedContentScope = animatedContentScope,
+      navigateUp = { composeNavigator.navigateUp() },
+      navigateToPaywalls = { composeNavigator.navigate(CatArticlesScreen.Paywalls) },
+    )
   }
 }
 
 @Composable
-private fun SharedTransitionScope.CatArticlesDetailContent(
+private fun CatArticlesDetailContent(
   article: Article,
   viewModel: CatArticlesDetailViewModel = hiltViewModel(),
-  animatedVisibilityScope: AnimatedVisibilityScope,
+  sharedTransitionScope: SharedTransitionScope,
+  animatedContentScope: AnimatedContentScope,
   navigateUp: () -> Unit,
+  navigateToPaywalls: () -> Unit,
 ) {
   var palette by rememberPaletteState()
   val backgroundBrush by palette.paletteBackgroundBrush()
@@ -124,13 +122,14 @@ private fun SharedTransitionScope.CatArticlesDetailContent(
 
   DetailsHeader(
     article = article,
-    animatedVisibilityScope = animatedVisibilityScope,
+    sharedTransitionScope = sharedTransitionScope,
+    animatedContentScope = animatedContentScope,
     onPaletteLoaded = { palette = it },
   )
 
   DetailsContent(
     article = article,
-    onJoinClicked = { viewModel.navigateToCustomPaywalls() },
+    onJoinClicked = navigateToPaywalls,
     isEntitled = isEntitled,
   )
 }
@@ -156,47 +155,50 @@ private fun DetailsAppBar(
 }
 
 @Composable
-private fun SharedTransitionScope.DetailsHeader(
+private fun DetailsHeader(
   article: Article,
-  animatedVisibilityScope: AnimatedVisibilityScope,
+  sharedTransitionScope: SharedTransitionScope,
+  animatedContentScope: AnimatedContentScope,
   onPaletteLoaded: (Palette) -> Unit,
 ) {
-  Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .catArticlesSharedElement(
-        isLocalInspectionMode = LocalInspectionMode.current,
-        state = rememberSharedContentState(key = "article-${article.title}"),
-        animatedVisibilityScope = animatedVisibilityScope,
-        boundsTransform = boundsTransform,
-      ),
-  ) {
-    GlideImage(
+  with(sharedTransitionScope) {
+    Column(
       modifier = Modifier
         .fillMaxWidth()
-        .height(460.dp),
-      imageModel = { article.cover },
-      imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-      component = rememberImageComponent {
-        +ShimmerPlugin(
-          Shimmer.Resonate(
-            baseColor = Color.Transparent,
-            highlightColor = Color.LightGray,
-          ),
-        )
-
-        if (!LocalInspectionMode.current) {
-          +PalettePlugin(
-            imageModel = article.cover,
-            useCache = true,
-            paletteLoadedListener = { onPaletteLoaded.invoke(it) },
+        .catArticlesSharedElement(
+          isLocalInspectionMode = LocalInspectionMode.current,
+          state = rememberSharedContentState(key = "article-${article.title}"),
+          animatedVisibilityScope = animatedContentScope,
+          boundsTransform = boundsTransform,
+        ),
+    ) {
+      GlideImage(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(460.dp),
+        imageModel = { article.cover },
+        imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+        component = rememberImageComponent {
+          +ShimmerPlugin(
+            Shimmer.Resonate(
+              baseColor = Color.Transparent,
+              highlightColor = Color.LightGray,
+            ),
           )
-        }
-      },
-      previewPlaceholder = painterResource(
-        id = R.drawable.placeholder,
-      ),
-    )
+
+          if (!LocalInspectionMode.current) {
+            +PalettePlugin(
+              imageModel = article.cover,
+              useCache = true,
+              paletteLoadedListener = { onPaletteLoaded.invoke(it) },
+            )
+          }
+        },
+        previewPlaceholder = painterResource(
+          id = R.drawable.placeholder,
+        ),
+      )
+    }
   }
 }
 
@@ -281,16 +283,12 @@ private fun DetailsContent(
 @Composable
 private fun CatArticlesDetailContentPreview() {
   CatArticlesTheme {
-    SharedTransitionLayout {
-      AnimatedVisibility(visible = true, label = "") {
-        Column(modifier = Modifier.fillMaxSize()) {
-          CatArticlesDetailContent(
-            article = mockArticle,
-            animatedVisibilityScope = this@AnimatedVisibility,
-            navigateUp = {},
-          )
-        }
-      }
+    Column(modifier = Modifier.fillMaxSize()) {
+      DetailsContent(
+        article = mockArticle,
+        isEntitled = false,
+        onJoinClicked = {},
+      )
     }
   }
 }

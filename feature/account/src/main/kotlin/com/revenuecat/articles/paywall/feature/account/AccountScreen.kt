@@ -19,17 +19,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.revenuecat.purchases.ui.revenuecatui.customercenter.CustomerCenter
 
 @Composable
-fun AccountScreen(
-  viewModel: AccountViewModel = hiltViewModel(),
-) {
+fun AccountScreen() {
+  val composeNavigator = currentComposeNavigator
+
   Box(modifier = Modifier.fillMaxSize()) {
     CustomerCenter(
       modifier = Modifier.fillMaxSize(),
-      onDismiss = { viewModel.navigateUp() },
+      onDismiss = { composeNavigator.navigateUp() },
     )
   }
 }

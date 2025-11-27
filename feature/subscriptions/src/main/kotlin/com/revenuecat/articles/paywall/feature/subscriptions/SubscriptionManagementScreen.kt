@@ -55,6 +55,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.revenuecat.articles.paywall.core.designsystem.component.CatArticlesAppBar
 import com.revenuecat.articles.paywall.core.designsystem.component.CatArticlesCircularProgress
 import com.revenuecat.articles.paywall.core.designsystem.theme.CatArticlesTheme
+import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
+import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.Package
@@ -67,13 +69,14 @@ fun SubscriptionManagementScreen(
   viewModel: SubscriptionManagementViewModel = hiltViewModel(),
 ) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+  val composeNavigator = currentComposeNavigator
 
   Column(modifier = Modifier.fillMaxSize()) {
     CatArticlesAppBar(
       modifier = Modifier.background(CatArticlesTheme.colors.primary),
       title = "Manage Subscription",
       navigationIcon = {
-        IconButton(onClick = { viewModel.navigateUp() }) {
+        IconButton(onClick = { composeNavigator.navigateUp() }) {
           Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Back",
@@ -95,7 +98,7 @@ fun SubscriptionManagementScreen(
         SubscriptionContent(
           offering = state.offering,
           customerInfo = state.customerInfo,
-          onNavigateToPaywall = { viewModel.navigateToPaywall() },
+          onNavigateToPaywall = { composeNavigator.navigate(CatArticlesScreen.Paywalls) },
         )
       }
 

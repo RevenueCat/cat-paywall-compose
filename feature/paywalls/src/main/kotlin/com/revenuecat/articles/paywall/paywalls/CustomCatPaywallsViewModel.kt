@@ -19,8 +19,6 @@ import android.app.Activity
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
-import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.Package
@@ -40,7 +38,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomCatPaywallsViewModel @Inject constructor(
   repository: PaywallsRepository,
-  private val navigator: AppComposeNavigator<CatArticlesScreen>,
 ) : ViewModel() {
 
   val uiState: StateFlow<PaywallsUiState> = repository.fetchOffering()
@@ -80,10 +77,6 @@ class CustomCatPaywallsViewModel @Inject constructor(
 
   fun handleEvent(event: PaywallEvent) {
     this.event.tryEmit(event)
-  }
-
-  fun navigateUp() {
-    navigator.navigateUp()
   }
 }
 

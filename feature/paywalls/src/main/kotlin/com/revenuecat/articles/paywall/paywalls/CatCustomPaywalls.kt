@@ -33,8 +33,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.slidetounlock.HintTexts
 import com.revenuecat.purchases.slidetounlock.SlideToUnlock
@@ -48,6 +49,7 @@ public fun CatCustomPaywalls(
 ) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   val purchaseUiState by viewModel.purchaseUiState.collectAsStateWithLifecycle()
+  val composeNavigator = currentComposeNavigator
 
   var offering: Offering? by remember { mutableStateOf(null) }
   var isSlided by remember { mutableStateOf(false) }
@@ -56,7 +58,7 @@ public fun CatCustomPaywalls(
 
   HandlePurchaseUiState(
     uiState = purchaseUiState,
-    onPurchaseSuccess = { viewModel.navigateUp() },
+    onPurchaseSuccess = { composeNavigator.navigateUp() },
     onPurchaseFailed = { isSlided = false },
   )
 
@@ -67,7 +69,7 @@ public fun CatCustomPaywalls(
   ) {
     Paywall(
       options = PaywallOptions.Builder(
-        dismissRequest = { viewModel.navigateUp() },
+        dismissRequest = { composeNavigator.navigateUp() },
       ).setOffering(offering).build(),
     )
 
