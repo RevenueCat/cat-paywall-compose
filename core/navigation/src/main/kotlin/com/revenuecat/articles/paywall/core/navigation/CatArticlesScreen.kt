@@ -15,11 +15,11 @@
  */
 package com.revenuecat.articles.paywall.core.navigation
 
+import androidx.navigation3.runtime.NavKey
 import com.revenuecat.articles.paywall.core.model.Article
 import kotlinx.serialization.Serializable
-import kotlin.reflect.typeOf
 
-sealed interface CatArticlesScreen {
+sealed interface CatArticlesScreen : NavKey {
 
   @Serializable
   data object CatHome : CatArticlesScreen
@@ -28,11 +28,7 @@ sealed interface CatArticlesScreen {
   data object Paywalls : CatArticlesScreen
 
   @Serializable
-  data class CatArticle(val article: Article) : CatArticlesScreen {
-    companion object {
-      val typeMap = mapOf(typeOf<Article>() to CatArticlesType)
-    }
-  }
+  data class CatArticle(val article: Article) : CatArticlesScreen
 
   @Serializable
   data object Account : CatArticlesScreen

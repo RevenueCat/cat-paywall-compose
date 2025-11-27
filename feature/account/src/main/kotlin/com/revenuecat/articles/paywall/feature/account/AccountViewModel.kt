@@ -16,17 +16,8 @@
 package com.revenuecat.articles.paywall.feature.account
 
 import androidx.lifecycle.ViewModel
-import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
-import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class AccountViewModel @Inject constructor(
-  private val navigator: AppComposeNavigator<CatArticlesScreen>,
-) : ViewModel() {
-
-  fun navigateUp() {
-    navigator.navigateUp()
-  }
-}
+class AccountViewModel @Inject constructor() : ViewModel()

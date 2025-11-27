@@ -16,22 +16,12 @@
 package com.revenuecat.articles.paywall.compose.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.compose.rememberNavController
 import com.revenuecat.articles.paywall.compose.navigation.CatArticlesNavHost
 import com.revenuecat.articles.paywall.core.designsystem.theme.CatArticlesTheme
-import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
-import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 
 @Composable
-fun CatArticlesMain(composeNavigator: AppComposeNavigator<CatArticlesScreen>) {
+fun CatArticlesMain() {
   CatArticlesTheme {
-    val navHostController = rememberNavController()
-
-    LaunchedEffect(Unit) {
-      composeNavigator.handleNavigationCommands(navHostController)
-    }
-
-    CatArticlesNavHost(navHostController = navHostController)
+    CatArticlesNavHost()
   }
 }

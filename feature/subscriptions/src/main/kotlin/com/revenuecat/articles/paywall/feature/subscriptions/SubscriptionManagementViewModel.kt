@@ -18,8 +18,6 @@ package com.revenuecat.articles.paywall.feature.subscriptions
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
-import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offering
@@ -34,7 +32,6 @@ import javax.inject.Inject
 @HiltViewModel
 class SubscriptionManagementViewModel @Inject constructor(
   repository: PaywallsRepository,
-  private val navigator: AppComposeNavigator<CatArticlesScreen>,
 ) : ViewModel() {
 
   val uiState: StateFlow<SubscriptionManagementUiState> = combine(
@@ -70,14 +67,6 @@ class SubscriptionManagementViewModel @Inject constructor(
     started = SharingStarted.WhileSubscribed(5000),
     initialValue = SubscriptionManagementUiState.Loading,
   )
-
-  fun navigateUp() {
-    navigator.navigateUp()
-  }
-
-  fun navigateToPaywall() {
-    navigator.navigate(CatArticlesScreen.Paywalls)
-  }
 }
 
 @Stable

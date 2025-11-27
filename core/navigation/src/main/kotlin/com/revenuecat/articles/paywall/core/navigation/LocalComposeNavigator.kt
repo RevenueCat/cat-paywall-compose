@@ -15,19 +15,20 @@
  */
 package com.revenuecat.articles.paywall.core.navigation
 
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.compositionLocalOf
 
-@Module
-@InstallIn(SingletonComponent::class)
-internal interface NavigationModule {
+val LocalComposeNavigator: ProvidableCompositionLocal<CatArticlesNavigator> =
+  compositionLocalOf {
+    error(
+      "No CatArticlesNavigator provided! Make sure to wrap your " +
+        "content with CompositionLocalProvider.",
+    )
+  }
 
-  @Binds
-  @Singleton
-  fun provideComposeNavigator(
-    catArticlesComposeNavigator: CatArticlesComposeNavigator,
-  ): AppComposeNavigator<CatArticlesScreen>
-}
+val currentComposeNavigator: CatArticlesNavigator
+  @Composable
+  @ReadOnlyComposable
+  get() = LocalComposeNavigator.current

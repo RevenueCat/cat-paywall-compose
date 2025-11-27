@@ -19,8 +19,6 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revenuecat.articles.paywall.core.model.Article
-import com.revenuecat.articles.paywall.core.navigation.AppComposeNavigator
-import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.coredata.repository.ArticlesRepository
 import com.skydoves.sandwich.fold
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +31,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CatArticlesViewModel @Inject constructor(
   repository: ArticlesRepository,
-  private val navigator: AppComposeNavigator<CatArticlesScreen>,
 ) : ViewModel() {
 
   val uiState: StateFlow<HomeUiState> = repository.fetchArticles()
@@ -47,14 +44,6 @@ class CatArticlesViewModel @Inject constructor(
       started = SharingStarted.WhileSubscribed(5000),
       initialValue = HomeUiState.Loading,
     )
-
-  fun navigateToDetails(article: Article) {
-    navigator.navigate(CatArticlesScreen.CatArticle(article))
-  }
-
-  fun navigateToAccount() {
-    navigator.navigate(CatArticlesScreen.Account)
-  }
 }
 
 @Stable
