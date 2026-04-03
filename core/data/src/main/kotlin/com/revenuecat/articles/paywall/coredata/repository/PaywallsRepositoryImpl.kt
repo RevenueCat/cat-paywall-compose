@@ -16,7 +16,6 @@
 package com.revenuecat.articles.paywall.coredata.repository
 
 import android.app.Activity
-import androidx.annotation.VisibleForTesting
 import com.revenuecat.articles.paywall.core.network.CatArticlesDispatchers
 import com.revenuecat.articles.paywall.core.network.Dispatcher
 import com.revenuecat.purchases.CustomerInfo
@@ -26,6 +25,8 @@ import com.revenuecat.purchases.PurchaseParams
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesException
 import com.revenuecat.purchases.awaitCustomerInfo
+import com.revenuecat.purchases.awaitLogIn
+import com.revenuecat.purchases.awaitLogOut
 import com.revenuecat.purchases.awaitOfferings
 import com.revenuecat.purchases.awaitPurchase
 import com.skydoves.sandwich.ApiResponse
@@ -35,8 +36,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-@VisibleForTesting
-public class PaywallsRepositoryImpl @Inject constructor(
+internal class PaywallsRepositoryImpl @Inject constructor(
   @Dispatcher(CatArticlesDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : PaywallsRepository {
 
@@ -75,5 +75,25 @@ public class PaywallsRepositoryImpl @Inject constructor(
     } catch (e: Exception) {
       emit(ApiResponse.exception(e))
     }
-  }
+  }.flowOn(ioDispatcher)
+
+  override fun logIn(userId: String): Flow<ApiResponse<CustomerInfo>> = flow {
+    try {
+      val result = Purchases.sharedInstance.awaitLogIn(userId)
+      emit(ApiResponse.of { result.customerInfo })
+    } catch (e: PurchasesException) {
+      emit(ApiResponse.exception(e))
+    }
+  }.flowOn(ioDispatcher)
+
+  override fun logOut(): Flow<ApiResponse<CustomerInfo>> = flow {
+    try {
+      val customerInfo = Purchases.sharedInstance.awaitLogOut()
+      emit(ApiResponse.of { customerInfo })
+    } catch (e: PurchasesException) {
+      emit(ApiResponse.exception(e))
+    }
+  }.flowOn(ioDispatcher)
+
+  override fun isAnonymous(): Boolean = Purchases.sharedInstance.isAnonymous
 }

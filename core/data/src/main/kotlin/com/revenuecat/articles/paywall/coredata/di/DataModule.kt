@@ -17,8 +17,12 @@ package com.revenuecat.articles.paywall.coredata.di
 
 import com.revenuecat.articles.paywall.coredata.repository.ArticlesRepository
 import com.revenuecat.articles.paywall.coredata.repository.ArticlesRepositoryImpl
+import com.revenuecat.articles.paywall.coredata.repository.BookmarksRepository
+import com.revenuecat.articles.paywall.coredata.repository.BookmarksRepositoryImpl
 import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
 import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepositoryImpl
+import com.revenuecat.articles.paywall.coredata.repository.ReadingTrackerRepository
+import com.revenuecat.articles.paywall.coredata.repository.ReadingTrackerRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,4 +37,10 @@ internal interface DataModule {
 
   @Binds
   fun bindsDetailsRepository(detailsRepositoryImpl: PaywallsRepositoryImpl): PaywallsRepository
+
+  @Binds
+  fun bindsReadingTrackerRepository(impl: ReadingTrackerRepositoryImpl): ReadingTrackerRepository
+
+  @Binds
+  fun bindsBookmarksRepository(impl: BookmarksRepositoryImpl): BookmarksRepository
 }

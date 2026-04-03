@@ -53,7 +53,6 @@ private inline fun <reified T : KotlinBaseExtension> Project.configureKotlin() =
     jvmTarget = JvmTarget.JVM_17
     allWarningsAsErrors = warningsAsErrors
     freeCompilerArgs.addAll(
-      "-Xcontext-receivers",
       "-opt-in=kotlin.RequiresOptIn",
       "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
       "-opt-in=com.google.accompanist.pager.ExperimentalPagerApi",
