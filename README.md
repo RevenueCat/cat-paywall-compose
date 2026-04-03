@@ -11,11 +11,12 @@
 The purpose of this repository is to demonstrate the following:
 
 - In-app purchases (subscriptions) using Google Play Billing.
-- Server-driven UI based paywall dialog with the RevenueCat's paywall editor.
+- Server-driven UI based paywall dialog with RevenueCat's paywall editor.
 - Checking user entitlements.
-- Full UI implementation using Jetpack Compose.
+- Full UI implementation using Jetpack Compose, Navigation 3.
 - Configuring structures with the Android architecture and Jetpack libraries such as Hilt and Jetpack Navigation.
 - A multi-module project structure and using Baseline Profiles to enhance app performance.
+- Automate in-app purchases, subscription flows with Test Store, and integrate into CI, GitHub Actions.
 
 ## 📷 Previews
 
@@ -38,6 +39,7 @@ Cat Paywall Compose is built using the [RevenueCat SDK for Android](https://www.
 - [Turn Your App into Revenue: Building Paywalls in Android With Jetpack Compose](https://www.revenuecat.com/blog/engineering/build-paywalls-compose/): In-app subscriptions have become a popular way to monetize mobile applications that offer recurring value to users. In this article, you'll learn how to seamlessly implement in-app subscriptions and paywall features in Android using Jetpack Compose and the RevenueCat SDK.
 - [How to monetize Android apps with ad-free subscriptions using RevenueCat](https://www.revenuecat.com/blog/engineering/ad-free-subscriptions-android/): Most apps monetize through ads using things like AdMob or Audience Network. To maximize your earnings with ads, you need to show as many of them as possible, which makes for a pretty lousy user experience.
 - [Server-driven UI SDK on Android: how RevenueCat enables remote paywalls without app updates](https://www.revenuecat.com/blog/engineering/server-driven-android/): In this article, we’ll explore the concept of server-driven UI, with a focus on how RevenueCat’s Paywall Editor enables you to build and remotely update paywalls—without needing app updates—using RevenueCat’s Android SDK.
+- [Simplify in-app purchase unit testing with RevenueCat’s Test Store](https://www.revenuecat.com/blog/engineering/testing-test-store/): In-app purchase testing has long been a pain point in Android development. Setting up Google Play sandbox environments, managing test accounts, waiting for purchase verification, dealing with cached state… the friction is real. Luckily, RevenueCat’s Test Store is a solution to this problem — offering instant testing without the complexity of real billing systems. But the real benefit of Test Store isn’t just its simplified setup, it’s how it enables true unit testing of purchase flows, with minimal infrastructure.
 
 ## 💻 [Codelab](https://revenuecat.github.io/)
 
