@@ -66,6 +66,7 @@ dependencies {
   api(projects.core.model)
   api(projects.core.network)
   implementation(libs.androidx.junit.ktx)
+  implementation(libs.androidx.datastore.preferences)
 
   // Testing
   testImplementation(libs.junit)

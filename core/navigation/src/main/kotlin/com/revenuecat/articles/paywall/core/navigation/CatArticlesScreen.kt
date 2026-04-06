@@ -15,10 +15,12 @@
  */
 package com.revenuecat.articles.paywall.core.navigation
 
+import androidx.compose.runtime.Stable
 import androidx.navigation3.runtime.NavKey
 import com.revenuecat.articles.paywall.core.model.Article
 import kotlinx.serialization.Serializable
 
+@Stable
 sealed interface CatArticlesScreen : NavKey {
 
   @Serializable
@@ -35,4 +37,7 @@ sealed interface CatArticlesScreen : NavKey {
 
   @Serializable
   data object SubscriptionManagement : CatArticlesScreen
+
+  @Serializable
+  data object Bookmarks : CatArticlesScreen
 }
