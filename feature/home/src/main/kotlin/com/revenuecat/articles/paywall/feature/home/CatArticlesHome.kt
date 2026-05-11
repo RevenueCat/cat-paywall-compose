@@ -22,6 +22,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +33,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -44,7 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,7 +67,7 @@ import com.revenuecat.articles.paywall.core.navigation.boundsTransform
 import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
 import com.skydoves.landscapist.placeholder.shimmer.ShimmerPlugin
 
@@ -75,12 +78,24 @@ fun CatArticlesHome(
   catArticlesViewModel: CatArticlesViewModel = hiltViewModel(),
 ) {
   val uiState by catArticlesViewModel.uiState.collectAsStateWithLifecycle()
+  val bookmarkedTitles by catArticlesViewModel.bookmarkedTitles.collectAsStateWithLifecycle()
+  val customerInfo by catArticlesViewModel.customerInfo.collectAsStateWithLifecycle()
+  val todayReadCount by catArticlesViewModel.todayReadCount.collectAsStateWithLifecycle()
   val composeNavigator = currentComposeNavigator
+  val entitlementIdentifier = stringResource(R.string.entitlement_premium)
+  val isEntitled = customerInfo?.entitlements?.get(entitlementIdentifier)?.isActive == true
 
   Column(modifier = Modifier.fillMaxSize()) {
     CatArticlesAppBar(
       modifier = Modifier.background(CatArticlesTheme.colors.primary),
       actions = {
+        IconButton(onClick = { composeNavigator.navigate(CatArticlesScreen.Bookmarks) }) {
+          Icon(
+            imageVector = Icons.Default.Bookmark,
+            contentDescription = "Bookmarks",
+            tint = Color.White,
+          )
+        }
         IconButton(onClick = { composeNavigator.navigate(CatArticlesScreen.Account) }) {
           Icon(
             imageVector = Icons.Default.AccountCircle,
@@ -93,9 +108,25 @@ fun CatArticlesHome(
 
     HomeContent(
       uiState = uiState,
+      bookmarkedTitles = bookmarkedTitles,
+      isEntitled = isEntitled,
+      todayReadCount = todayReadCount,
       sharedTransitionScope = sharedTransitionScope,
       animatedContentScope = animatedContentScope,
-      onNavigateToDetails = { composeNavigator.navigate(CatArticlesScreen.CatArticle(it)) },
+      onNavigateToDetails = { article ->
+        if (!isEntitled && todayReadCount >= 3) {
+          composeNavigator.navigate(CatArticlesScreen.Paywalls)
+        } else {
+          composeNavigator.navigate(CatArticlesScreen.CatArticle(article))
+        }
+      },
+      onToggleBookmark = { title ->
+        if (isEntitled) {
+          catArticlesViewModel.toggleBookmark(title)
+        } else {
+          composeNavigator.navigate(CatArticlesScreen.Paywalls)
+        }
+      },
     )
   }
 }
@@ -103,26 +134,38 @@ fun CatArticlesHome(
 @Composable
 private fun HomeContent(
   uiState: HomeUiState,
+  bookmarkedTitles: Set<String>,
+  isEntitled: Boolean,
+  todayReadCount: Int,
   sharedTransitionScope: SharedTransitionScope,
   animatedContentScope: AnimatedContentScope,
   onNavigateToDetails: (Article) -> Unit,
+  onToggleBookmark: (String) -> Unit,
 ) {
-  Box(modifier = Modifier.fillMaxSize()) {
-    if (uiState == HomeUiState.Loading) {
-      CatArticlesCircularProgress()
-    } else if (uiState is HomeUiState.Success) {
-      LazyVerticalGrid(
-        modifier = Modifier.testTag("CatArticlesList"),
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(6.dp),
-      ) {
-        items(items = uiState.articles, key = { it.title }) { article ->
-          ArticleCard(
-            article = article,
-            sharedTransitionScope = sharedTransitionScope,
-            animatedContentScope = animatedContentScope,
-            onNavigateToDetails = onNavigateToDetails,
-          )
+  Column(modifier = Modifier.fillMaxSize()) {
+    if (!isEntitled) {
+      QuotaBanner(todayReadCount = todayReadCount)
+    }
+
+    Box(modifier = Modifier.weight(1f)) {
+      if (uiState == HomeUiState.Loading) {
+        CatArticlesCircularProgress()
+      } else if (uiState is HomeUiState.Success) {
+        LazyVerticalGrid(
+          modifier = Modifier.testTag("CatArticlesList"),
+          columns = GridCells.Fixed(2),
+          contentPadding = PaddingValues(6.dp),
+        ) {
+          items(items = uiState.articles, key = { it.title }) { article ->
+            ArticleCard(
+              article = article,
+              isBookmarked = article.title in bookmarkedTitles,
+              sharedTransitionScope = sharedTransitionScope,
+              animatedContentScope = animatedContentScope,
+              onNavigateToDetails = onNavigateToDetails,
+              onToggleBookmark = { onToggleBookmark(article.title) },
+            )
+          }
         }
       }
     }
@@ -130,11 +173,46 @@ private fun HomeContent(
 }
 
 @Composable
+private fun QuotaBanner(todayReadCount: Int) {
+  val limitReached = todayReadCount >= 3
+  val bannerColor = if (limitReached) {
+    Color(
+      0xFFFFF3CD,
+    )
+  } else {
+    CatArticlesTheme.colors.primary.copy(alpha = 0.1f)
+  }
+  val textColor = if (limitReached) Color(0xFF856404) else CatArticlesTheme.colors.black
+  val message = if (limitReached) {
+    "Daily limit reached · Subscribe for unlimited access"
+  } else {
+    "$todayReadCount / 3 free articles read today"
+  }
+
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .background(bannerColor)
+      .padding(horizontal = 16.dp, vertical = 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = message,
+      fontSize = 13.sp,
+      color = textColor,
+      fontWeight = if (limitReached) FontWeight.SemiBold else FontWeight.Normal,
+    )
+  }
+}
+
+@Composable
 private fun ArticleCard(
   article: Article,
+  isBookmarked: Boolean,
   sharedTransitionScope: SharedTransitionScope,
   animatedContentScope: AnimatedContentScope,
   onNavigateToDetails: (Article) -> Unit,
+  onToggleBookmark: () -> Unit,
 ) {
   with(sharedTransitionScope) {
     Box(
@@ -146,15 +224,16 @@ private fun ArticleCard(
         .clip(RoundedCornerShape(6.dp))
         .clickable { onNavigateToDetails.invoke(article) }
         .catArticlesSharedElement(
+          sharedTransitionScope = this,
           isLocalInspectionMode = LocalInspectionMode.current,
           state = rememberSharedContentState(key = "article-${article.title}"),
           animatedVisibilityScope = animatedContentScope,
           boundsTransform = boundsTransform,
         ),
     ) {
-      GlideImage(
-        modifier = Modifier.fillMaxSize(),
+      LandscapistImage(
         imageModel = { article.cover },
+        modifier = Modifier.fillMaxSize(),
         imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         component = rememberImageComponent {
           +ShimmerPlugin(
@@ -164,9 +243,6 @@ private fun ArticleCard(
             ),
           )
         },
-        previewPlaceholder = painterResource(
-          id = R.drawable.placeholder,
-        ),
       )
 
       Text(
@@ -181,6 +257,17 @@ private fun ArticleCard(
         fontSize = 14.sp,
         fontWeight = FontWeight.Bold,
       )
+
+      IconButton(
+        modifier = Modifier.align(Alignment.TopEnd),
+        onClick = onToggleBookmark,
+      ) {
+        Icon(
+          imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+          contentDescription = if (isBookmarked) "Remove bookmark" else "Add bookmark",
+          tint = Color.White,
+        )
+      }
     }
   }
 }
@@ -209,11 +296,10 @@ private fun HomeContentPreviewContent() {
             .height(300.dp)
             .clip(RoundedCornerShape(6.dp)),
         ) {
-          GlideImage(
-            modifier = Modifier.fillMaxSize(),
+          LandscapistImage(
             imageModel = { article.cover },
+            modifier = Modifier.fillMaxSize(),
             imageOptions = ImageOptions(contentScale = ContentScale.Crop),
-            previewPlaceholder = painterResource(id = R.drawable.placeholder),
           )
 
           Text(

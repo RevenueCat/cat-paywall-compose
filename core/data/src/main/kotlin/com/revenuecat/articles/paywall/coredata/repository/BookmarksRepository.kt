@@ -15,28 +15,9 @@
  */
 package com.revenuecat.articles.paywall.coredata.repository
 
-import android.app.Activity
-import com.revenuecat.purchases.CustomerInfo
-import com.revenuecat.purchases.Offering
-import com.revenuecat.purchases.Package
-import com.revenuecat.purchases.PurchaseResult
-import com.skydoves.sandwich.ApiResponse
 import kotlinx.coroutines.flow.Flow
 
-interface PaywallsRepository {
-
-  fun fetchOffering(): Flow<ApiResponse<Offering>>
-
-  fun fetchCustomerInfo(): Flow<ApiResponse<CustomerInfo?>>
-
-  fun awaitPurchases(
-    activity: Activity,
-    availablePackage: Package,
-  ): Flow<ApiResponse<PurchaseResult>>
-
-  fun logIn(userId: String): Flow<ApiResponse<CustomerInfo>>
-
-  fun logOut(): Flow<ApiResponse<CustomerInfo>>
-
-  fun isAnonymous(): Boolean
+interface BookmarksRepository {
+  val bookmarkedArticleTitles: Flow<Set<String>>
+  suspend fun toggleBookmark(articleTitle: String)
 }

@@ -30,11 +30,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,8 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -66,7 +70,7 @@ import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.revenuecat.purchases.InternalRevenueCatAPI
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
-import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.image.LandscapistImage
 import com.skydoves.landscapist.palette.PalettePlugin
 import com.skydoves.landscapist.palette.rememberPaletteState
 import com.skydoves.landscapist.placeholder.shimmer.Shimmer
@@ -101,7 +105,7 @@ fun CatArticlesDetail(
 @Composable
 private fun CatArticlesDetailContent(
   article: Article,
-  viewModel: CatArticlesDetailViewModel = hiltViewModel(),
+  viewModel: CatArticlesDetailViewModel,
   sharedTransitionScope: SharedTransitionScope,
   animatedContentScope: AnimatedContentScope,
   navigateUp: () -> Unit,
@@ -111,13 +115,42 @@ private fun CatArticlesDetailContent(
   val backgroundBrush by palette.paletteBackgroundBrush()
 
   val customerInfo by viewModel.customerInfo.collectAsStateWithLifecycle()
+  val bookmarkedTitles by viewModel.bookmarkedTitles.collectAsStateWithLifecycle()
+  val todayReadCount by viewModel.todayReadCount.collectAsStateWithLifecycle()
+  val shouldShowPromo by viewModel.shouldShowPromo.collectAsStateWithLifecycle()
+  val offering by viewModel.offering.collectAsStateWithLifecycle()
+  val context = LocalContext.current
   val entitlementIdentifier = stringResource(R.string.entitlement_premium)
   val isEntitled = customerInfo?.entitlements[entitlementIdentifier]?.isActive == true
+  val isBookmarked = article.title in bookmarkedTitles
+  val isQuotaExceeded = todayReadCount > 3 && !isEntitled
+
+  LaunchedEffect(article.title) {
+    viewModel.recordRead(article.title)
+  }
+
+  if (shouldShowPromo && offering != null) {
+    PromoBottomSheet(
+      offering = offering!!,
+      onPurchase = { pkg ->
+        (context as? android.app.Activity)?.let { viewModel.purchasePackage(it, pkg) }
+      },
+      onDismiss = { viewModel.dismissPromo() },
+    )
+  }
 
   DetailsAppBar(
     article = article,
     navigateUp = navigateUp,
     backgroundBrush = backgroundBrush,
+    isBookmarked = isBookmarked,
+    onToggleBookmark = {
+      viewModel.toggleBookmark(
+        articleTitle = article.title,
+        isPremium = isEntitled,
+        onNotPremium = navigateToPaywalls,
+      )
+    },
   )
 
   DetailsHeader(
@@ -131,6 +164,7 @@ private fun CatArticlesDetailContent(
     article = article,
     onJoinClicked = navigateToPaywalls,
     isEntitled = isEntitled,
+    isQuotaExceeded = isQuotaExceeded,
   )
 }
 
@@ -139,6 +173,8 @@ private fun DetailsAppBar(
   article: Article,
   backgroundBrush: Brush,
   navigateUp: () -> Unit,
+  isBookmarked: Boolean,
+  onToggleBookmark: () -> Unit,
 ) {
   CatArticlesAppBar(
     modifier = Modifier.background(backgroundBrush),
@@ -150,6 +186,15 @@ private fun DetailsAppBar(
         tint = Color.White,
         contentDescription = null,
       )
+    },
+    actions = {
+      IconButton(onClick = onToggleBookmark) {
+        Icon(
+          imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+          contentDescription = if (isBookmarked) "Remove bookmark" else "Add bookmark",
+          tint = Color.White,
+        )
+      }
     },
   )
 }
@@ -166,17 +211,18 @@ private fun DetailsHeader(
       modifier = Modifier
         .fillMaxWidth()
         .catArticlesSharedElement(
+          sharedTransitionScope = this,
           isLocalInspectionMode = LocalInspectionMode.current,
           state = rememberSharedContentState(key = "article-${article.title}"),
           animatedVisibilityScope = animatedContentScope,
           boundsTransform = boundsTransform,
         ),
     ) {
-      GlideImage(
+      LandscapistImage(
+        imageModel = { article.cover },
         modifier = Modifier
           .fillMaxWidth()
           .height(460.dp),
-        imageModel = { article.cover },
         imageOptions = ImageOptions(contentScale = ContentScale.Crop),
         component = rememberImageComponent {
           +ShimmerPlugin(
@@ -194,9 +240,6 @@ private fun DetailsHeader(
             )
           }
         },
-        previewPlaceholder = painterResource(
-          id = R.drawable.placeholder,
-        ),
       )
     }
   }
@@ -206,8 +249,14 @@ private fun DetailsHeader(
 private fun DetailsContent(
   article: Article,
   isEntitled: Boolean,
+  isQuotaExceeded: Boolean,
   onJoinClicked: () -> Unit,
 ) {
+  if (isQuotaExceeded) {
+    DailyLimitContent(onJoinClicked = onJoinClicked)
+    return
+  }
+
   Column(
     modifier = Modifier
       .fillMaxSize()
@@ -279,6 +328,50 @@ private fun DetailsContent(
   }
 }
 
+@Composable
+private fun DailyLimitContent(onJoinClicked: () -> Unit) {
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(vertical = 48.dp, horizontal = 28.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Text(
+      modifier = Modifier.fillMaxWidth(),
+      textAlign = TextAlign.Center,
+      text = "Daily limit reached",
+      fontWeight = FontWeight.Bold,
+      fontSize = 22.sp,
+      color = CatArticlesTheme.colors.black,
+    )
+
+    Text(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 12.dp),
+      textAlign = TextAlign.Center,
+      text = "You've used all 3 free articles for today. Subscribe for unlimited access.",
+      fontSize = 16.sp,
+      color = CatArticlesTheme.colors.black,
+    )
+
+    Button(
+      modifier = Modifier.padding(top = 32.dp),
+      colors = ButtonDefaults.buttonColors(
+        containerColor = CatArticlesTheme.colors.primary,
+      ),
+      onClick = onJoinClicked,
+    ) {
+      Text(
+        text = stringResource(R.string.paywall_cta),
+        color = CatArticlesTheme.colors.absoluteWhite,
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+      )
+    }
+  }
+}
+
 @Preview
 @Composable
 private fun CatArticlesDetailContentPreview() {
@@ -287,6 +380,7 @@ private fun CatArticlesDetailContentPreview() {
       DetailsContent(
         article = mockArticle,
         isEntitled = false,
+        isQuotaExceeded = false,
         onJoinClicked = {},
       )
     }

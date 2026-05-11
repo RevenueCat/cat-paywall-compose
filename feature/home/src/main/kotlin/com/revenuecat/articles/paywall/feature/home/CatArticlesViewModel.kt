@@ -20,17 +20,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.revenuecat.articles.paywall.core.model.Article
 import com.revenuecat.articles.paywall.coredata.repository.ArticlesRepository
+import com.revenuecat.articles.paywall.coredata.repository.BookmarksRepository
+import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
+import com.revenuecat.articles.paywall.coredata.repository.ReadingTrackerRepository
+import com.revenuecat.purchases.CustomerInfo
 import com.skydoves.sandwich.fold
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CatArticlesViewModel @Inject constructor(
   repository: ArticlesRepository,
+  private val bookmarksRepository: BookmarksRepository,
+  paywallsRepository: PaywallsRepository,
+  readingTrackerRepository: ReadingTrackerRepository,
 ) : ViewModel() {
 
   val uiState: StateFlow<HomeUiState> = repository.fetchArticles()
@@ -41,9 +50,35 @@ class CatArticlesViewModel @Inject constructor(
       )
     }.stateIn(
       scope = viewModelScope,
-      started = SharingStarted.WhileSubscribed(5000),
+      started = SharingStarted.WhileSubscribed(5_000),
       initialValue = HomeUiState.Loading,
     )
+
+  val bookmarkedTitles: StateFlow<Set<String>> = bookmarksRepository.bookmarkedArticleTitles
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5_000),
+      initialValue = emptySet(),
+    )
+
+  val customerInfo: StateFlow<CustomerInfo?> = paywallsRepository.fetchCustomerInfo()
+    .map { it.fold(onSuccess = { c -> c }, onFailure = { null }) }
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5_000),
+      initialValue = null,
+    )
+
+  val todayReadCount: StateFlow<Int> = readingTrackerRepository.todayReadCount
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5_000),
+      initialValue = 0,
+    )
+
+  fun toggleBookmark(articleTitle: String) {
+    viewModelScope.launch { bookmarksRepository.toggleBookmark(articleTitle) }
+  }
 }
 
 @Stable

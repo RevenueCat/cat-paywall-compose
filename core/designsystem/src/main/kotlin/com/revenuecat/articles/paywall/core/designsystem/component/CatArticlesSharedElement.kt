@@ -19,7 +19,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SharedTransitionScope.OverlayClip
-import androidx.compose.animation.SharedTransitionScope.PlaceHolderSize
+import androidx.compose.animation.SharedTransitionScope.PlaceholderSize
 import androidx.compose.animation.SharedTransitionScope.SharedContentState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
@@ -30,13 +30,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 
-context(SharedTransitionScope)
 fun Modifier.catArticlesSharedElement(
+  sharedTransitionScope: SharedTransitionScope,
   isLocalInspectionMode: Boolean,
   state: SharedContentState,
   animatedVisibilityScope: AnimatedVisibilityScope,
   boundsTransform: BoundsTransform = DefaultBoundsTransform,
-  placeHolderSize: PlaceHolderSize = PlaceHolderSize.contentSize,
+  placeholderSize: PlaceholderSize = PlaceholderSize.ContentSize,
   renderInOverlayDuringTransition: Boolean = true,
   zIndexInOverlay: Float = 0f,
   clipInOverlayDuringTransition: OverlayClip = ParentClip,
@@ -44,15 +44,17 @@ fun Modifier.catArticlesSharedElement(
   return if (isLocalInspectionMode) {
     this
   } else {
-    this.sharedBounds(
-      sharedContentState = state,
-      animatedVisibilityScope = animatedVisibilityScope,
-      boundsTransform = boundsTransform,
-      placeHolderSize = placeHolderSize,
-      renderInOverlayDuringTransition = renderInOverlayDuringTransition,
-      zIndexInOverlay = zIndexInOverlay,
-      clipInOverlayDuringTransition = clipInOverlayDuringTransition,
-    )
+    with(sharedTransitionScope) {
+      this@catArticlesSharedElement.sharedBounds(
+        sharedContentState = state,
+        animatedVisibilityScope = animatedVisibilityScope,
+        boundsTransform = boundsTransform,
+        placeholderSize = placeholderSize,
+        renderInOverlayDuringTransition = renderInOverlayDuringTransition,
+        zIndexInOverlay = zIndexInOverlay,
+        clipInOverlayDuringTransition = clipInOverlayDuringTransition,
+      )
+    }
   }
 }
 

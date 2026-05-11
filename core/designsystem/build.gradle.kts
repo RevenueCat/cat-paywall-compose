@@ -27,7 +27,7 @@ dependencies {
   api(libs.androidx.startup)
 
   // image loading
-  api(libs.landscapist.glide)
+  api(libs.landscapist.image)
   api(libs.landscapist.animation)
   api(libs.landscapist.placeholder)
   api(libs.landscapist.palette)

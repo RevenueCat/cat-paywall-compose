@@ -35,15 +35,6 @@ android {
     versionName = "1.0"
   }
 
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-  }
-
-  kotlinOptions {
-    jvmTarget = "11"
-  }
-
   buildFeatures {
     compose = true
     buildConfig = true
@@ -69,6 +60,7 @@ dependencies {
   implementation(projects.feature.paywalls)
   implementation(projects.feature.account)
   implementation(projects.feature.subscriptions)
+  implementation(projects.feature.bookmarks)
 
   // RevenueCat
   implementation(libs.revenuecat)
@@ -90,7 +82,7 @@ dependencies {
   implementation(libs.androidx.compose.material.iconsExtended)
 
   // Compose Image Loading
-  implementation(libs.landscapist.glide)
+  implementation(libs.landscapist.image)
   implementation(libs.landscapist.animation)
   implementation(libs.landscapist.placeholder)
 

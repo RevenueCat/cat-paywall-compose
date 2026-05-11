@@ -31,6 +31,7 @@ import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.core.navigation.LocalComposeNavigator
 import com.revenuecat.articles.paywall.feature.account.AccountScreen
 import com.revenuecat.articles.paywall.feature.article.CatArticlesDetail
+import com.revenuecat.articles.paywall.feature.bookmarks.BookmarksScreen
 import com.revenuecat.articles.paywall.feature.home.CatArticlesHome
 import com.revenuecat.articles.paywall.feature.subscriptions.SubscriptionManagementScreen
 import com.revenuecat.articles.paywall.paywalls.CatCustomPaywalls
@@ -75,6 +76,13 @@ fun CatArticlesNavHost() {
 
           entry<CatArticlesScreen.SubscriptionManagement> {
             SubscriptionManagementScreen()
+          }
+
+          entry<CatArticlesScreen.Bookmarks> {
+            BookmarksScreen(
+              sharedTransitionScope = this@SharedTransitionLayout,
+              animatedContentScope = LocalNavAnimatedContentScope.current,
+            )
           }
         },
       )
