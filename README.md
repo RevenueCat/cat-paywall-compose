@@ -41,14 +41,14 @@ Cat Paywall Compose is built using the [RevenueCat SDK for Android](https://www.
 
 ## 💻 [Codelab](https://revenuecat.github.io/)
 
-1. [RevenueCat Google Play Integration](https://revenuecat.github.io/codelab/google-play/codelab-1-google-play-integration/index.html#0): In this codelab, you'll learn how to:
+1. [RevenueCat Google Play Integration](https://revenuecat.github.io/codelabs/google-play.html#0): In this codelab, you'll learn how to:
 
    - Properly configure products on Google Play.
    - Set up the RevenueCat dashboard and connect it to your Google Play products.
    - Understanding Product, Offering, Package, and Entitlement.
    - Create paywalls using the [Paywall Editor](https://www.revenuecat.com/docs/tools/paywalls/creating-paywalls#using-the-editor?utm_medium=organic&utm_source=github&utm_campaign=advocate).
 
-2. [Android In-App Purchases & Paywalls](https://revenuecat.github.io/codelab/android/codelab-2-android-sdk/index.html#0): In this codelab, you will:
+2. [Android In-App Purchases & Paywalls](https://revenuecat.github.io/codelabs/android.html#0): In this codelab, you will:
 
    - Integrate the Android RevenueCat SDK into your project
    - Implement in-app purchases in your Android application
