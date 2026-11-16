@@ -13,8 +13,17 @@ class SpotlessConventionPlugin : Plugin<Project> {
           target("**/*.kt")
           targetExclude("**/build/**/*.kt")
           ktlint()
-            .userData(mapOf("android" to "true"))
-            .editorConfigOverride(mapOf("indent_size" to 2, "continuation_indent_size" to 2))
+            .editorConfigOverride(
+              mapOf(
+                "indent_size" to 2,
+                "continuation_indent_size" to 2,
+                // Spotless never passed the removed userData("android") to ktlint 0.50, so this code base
+                // was formatted with ktlint's former default style. ktlint 1.x defaults to ktlint_official.
+                "ktlint_code_style" to "intellij_idea",
+                // Composables are PascalCase by convention.
+                "ktlint_function_naming_ignore_when_annotated_with" to "Composable",
+              ),
+            )
           licenseHeaderFile(rootProject.file("$rootDir/spotless/copyright.kt"))
         }
         format("kts") {

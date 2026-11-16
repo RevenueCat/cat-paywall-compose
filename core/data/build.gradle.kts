@@ -53,13 +53,6 @@ android {
       isIncludeAndroidResources = true
     }
   }
-
-  // Exclude hilt-navigation-compose from androidTest to avoid minSdk conflicts
-  configurations {
-    getByName("androidTestImplementation") {
-      exclude(group = "androidx.hilt", module = "hilt-navigation-compose")
-    }
-  }
 }
 
 dependencies {

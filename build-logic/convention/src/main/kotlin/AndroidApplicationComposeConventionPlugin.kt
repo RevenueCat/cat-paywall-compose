@@ -1,4 +1,4 @@
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.build.api.dsl.ApplicationExtension
 import com.revenuecat.configureAndroidCompose
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -8,7 +8,7 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
     with(target) {
       pluginManager.apply("com.android.application")
-      val extension = extensions.getByType<BaseAppModuleExtension>()
+      val extension = extensions.getByType<ApplicationExtension>()
       configureAndroidCompose(extension)
     }
   }

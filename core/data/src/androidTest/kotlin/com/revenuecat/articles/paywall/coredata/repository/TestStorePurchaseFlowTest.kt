@@ -59,8 +59,8 @@ import kotlin.time.Duration.Companion.seconds
  * ## How Test Store Works
  *
  * When you call `awaitPurchase()` with Test Store, it shows an AlertDialog with 3 options:
- * 1. "Test valid Purchase" - Simulates successful purchase
- * 2. "Test failed Purchase" - Simulates purchase failure
+ * 1. "Test valid purchase" - Simulates successful purchase
+ * 2. "Test failed purchase" - Simulates purchase failure
  * 3. "Cancel" - Simulates user cancellation
  *
  * ## Test Approach
@@ -128,7 +128,7 @@ class TestStorePurchaseFlowTest {
    * 1. Fetch offerings from Test Store
    * 2. Select first available package
    * 3. Initiate purchase
-   * 4. Click "Test valid Purchase" in dialog
+   * 4. Click "Test valid purchase" in dialog
    * 5. Verify entitlements granted
    */
   @Test
@@ -174,13 +174,13 @@ class TestStorePurchaseFlowTest {
         }
       }
 
-      // Step 4: Wait for Test Store dialog and click "Test valid Purchase"
+      // Step 4: Wait for Test Store dialog and click "Test valid purchase"
       println("\nStep 4: Waiting for Test Store dialog...")
       delay(2000) // Give dialog time to appear
 
-      println("Clicking 'Test valid Purchase' button...")
+      println("Clicking 'Test valid purchase' button...")
       try {
-        onView(withText("Test valid Purchase")).perform(click())
+        onView(withText("Test valid purchase")).perform(click())
         println("Button clicked successfully")
       } catch (e: Exception) {
         println("Failed to click button: ${e.message}")
@@ -318,7 +318,7 @@ class TestStorePurchaseFlowTest {
   /**
    * Test 3: Failed Purchase Flow
    *
-   * Verifies that clicking "Test failed Purchase" properly
+   * Verifies that clicking "Test failed purchase" properly
    * returns an error.
    */
   @Test
@@ -359,10 +359,10 @@ class TestStorePurchaseFlowTest {
       println("\nWaiting for Test Store dialog...")
       delay(2000)
 
-      // Click "Test failed Purchase"
-      println("Clicking 'Test failed Purchase' button...")
+      // Click "Test failed purchase"
+      println("Clicking 'Test failed purchase' button...")
       try {
-        onView(withText("Test failed Purchase")).perform(click())
+        onView(withText("Test failed purchase")).perform(click())
         println("Button clicked")
       } catch (e: Exception) {
         println("Failed to click button: ${e.message}")
@@ -454,7 +454,7 @@ class TestStorePurchaseFlowTest {
       }
 
       delay(2000)
-      onView(withText("Test valid Purchase")).perform(click())
+      onView(withText("Test valid purchase")).perform(click())
 
       withTimeout(30.seconds) {
         while (result1 == null) delay(500)
@@ -484,7 +484,7 @@ class TestStorePurchaseFlowTest {
       }
 
       delay(2000)
-      onView(withText("Test valid Purchase")).perform(click())
+      onView(withText("Test valid purchase")).perform(click())
 
       withTimeout(30.seconds) {
         while (result2 == null) delay(500)

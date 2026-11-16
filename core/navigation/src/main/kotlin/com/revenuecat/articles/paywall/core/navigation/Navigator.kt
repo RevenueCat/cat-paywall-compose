@@ -23,19 +23,16 @@ interface CatArticlesNavigator {
   fun navigateUp(): Boolean
 }
 
-class CatArticlesNavigatorImpl(
-  private val backStack: NavBackStack<NavKey>,
-) : CatArticlesNavigator {
+class CatArticlesNavigatorImpl(private val backStack: NavBackStack<NavKey>) :
+  CatArticlesNavigator {
 
   override fun navigate(screen: CatArticlesScreen) {
     backStack.add(screen)
   }
 
-  override fun navigateUp(): Boolean {
-    return if (backStack.size > 1) {
-      backStack.removeLastOrNull() != null
-    } else {
-      false
-    }
+  override fun navigateUp(): Boolean = if (backStack.size > 1) {
+    backStack.removeLastOrNull() != null
+  } else {
+    false
   }
 }

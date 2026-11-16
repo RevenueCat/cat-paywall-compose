@@ -78,12 +78,12 @@ class CatArticlesDetailViewModel @Inject constructor(
       initialValue = null,
     )
 
-  private val _promoShownThisSession = MutableStateFlow(false)
+  private val promoShownThisSession = MutableStateFlow(false)
 
   val shouldShowPromo: StateFlow<Boolean> = combine(
     todayReadCount,
     customerInfo,
-    _promoShownThisSession,
+    promoShownThisSession,
   ) { count, info, shown ->
     val isEntitled = info?.entitlements?.active?.isNotEmpty() == true
     count == 3 && !isEntitled && !shown
@@ -94,7 +94,7 @@ class CatArticlesDetailViewModel @Inject constructor(
   )
 
   fun dismissPromo() {
-    _promoShownThisSession.value = true
+    promoShownThisSession.value = true
   }
 
   fun purchasePackage(activity: Activity, pkg: Package) {

@@ -32,18 +32,16 @@ data class CatArticlesBackground(
 ) {
   companion object {
     @Composable
-    fun defaultBackground(darkTheme: Boolean): CatArticlesBackground {
-      return if (darkTheme) {
-        CatArticlesBackground(
-          color = colorResource(id = R.color.background_dark),
-          tonalElevation = 0.dp,
-        )
-      } else {
-        CatArticlesBackground(
-          color = colorResource(id = R.color.background),
-          tonalElevation = 0.dp,
-        )
-      }
+    fun defaultBackground(darkTheme: Boolean): CatArticlesBackground = if (darkTheme) {
+      CatArticlesBackground(
+        color = colorResource(id = R.color.background_dark),
+        tonalElevation = 0.dp,
+      )
+    } else {
+      CatArticlesBackground(
+        color = colorResource(id = R.color.background),
+        tonalElevation = 0.dp,
+      )
     }
   }
 }

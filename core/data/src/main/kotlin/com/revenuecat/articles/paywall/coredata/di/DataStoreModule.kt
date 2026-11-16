@@ -54,7 +54,6 @@ object DataStoreModule {
   @Provides
   @Singleton
   @BookmarksDataStore
-  fun providesBookmarksDataStore(
-    @ApplicationContext context: Context,
-  ): DataStore<Preferences> = context.bookmarksDataStore
+  fun providesBookmarksDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+    context.bookmarksDataStore
 }

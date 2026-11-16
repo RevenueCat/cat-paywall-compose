@@ -55,8 +55,7 @@ class StartupBenchmarks {
   val rule = MacrobenchmarkRule()
 
   @Test
-  fun startupCompilationNone() =
-    benchmark(CompilationMode.None())
+  fun startupCompilationNone() = benchmark(CompilationMode.None())
 
   @Test
   fun startupCompilationBaselineProfiles() =

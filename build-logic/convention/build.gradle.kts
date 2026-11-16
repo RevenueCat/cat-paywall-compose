@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
   `kotlin-dsl`
 }
@@ -7,6 +9,13 @@ group = "com.revenuecat.articles.paywall.compose.buildlogic"
 java {
   sourceCompatibility = JavaVersion.VERSION_17
   targetCompatibility = JavaVersion.VERSION_17
+}
+
+// Without this Kotlin targets the JDK running Gradle (21 in CI) while Java targets 17.
+kotlin {
+  compilerOptions {
+    jvmTarget = JvmTarget.JVM_17
+  }
 }
 
 dependencies {

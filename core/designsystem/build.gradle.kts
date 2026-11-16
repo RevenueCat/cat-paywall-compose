@@ -33,7 +33,9 @@ dependencies {
   api(libs.landscapist.palette)
 
   // compose
-  implementation(platform(libs.androidx.compose.bom))
+  // The Compose artifacts below are exported without versions, so the BOM that versions them has to
+  // be exported too; otherwise consumers resolve e.g. material-icons-extended with no version.
+  api(platform(libs.androidx.compose.bom))
   api(libs.androidx.compose.runtime)
   api(libs.androidx.compose.animation)
   api(libs.androidx.compose.ui)

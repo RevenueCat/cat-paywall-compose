@@ -65,9 +65,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun SubscriptionManagementScreen(
-  viewModel: SubscriptionManagementViewModel = hiltViewModel(),
-) {
+fun SubscriptionManagementScreen(viewModel: SubscriptionManagementViewModel = hiltViewModel()) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   val composeNavigator = currentComposeNavigator
 
@@ -282,10 +280,7 @@ private fun CurrentSubscriptionCard(
 }
 
 @Composable
-private fun ActiveSubscriptionCard(
-  subscriptionId: String,
-  customerInfo: CustomerInfo,
-) {
+private fun ActiveSubscriptionCard(subscriptionId: String, customerInfo: CustomerInfo) {
   Card(
     modifier = Modifier.fillMaxWidth(),
     colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -327,11 +322,7 @@ private fun ActiveSubscriptionCard(
 }
 
 @Composable
-private fun PackageCard(
-  pkg: Package,
-  isCurrentPlan: Boolean,
-  onNavigateToPaywall: () -> Unit,
-) {
+private fun PackageCard(pkg: Package, isCurrentPlan: Boolean, onNavigateToPaywall: () -> Unit) {
   Card(
     modifier = Modifier.fillMaxWidth(),
     colors = CardDefaults.cardColors(

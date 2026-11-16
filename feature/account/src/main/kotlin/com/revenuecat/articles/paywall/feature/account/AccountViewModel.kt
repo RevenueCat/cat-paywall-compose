@@ -29,9 +29,8 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
-class AccountViewModel @Inject constructor(
-  private val repository: PaywallsRepository,
-) : ViewModel() {
+class AccountViewModel @Inject constructor(private val repository: PaywallsRepository) :
+  ViewModel() {
 
   private val _isAnonymous = MutableStateFlow(repository.isAnonymous())
   val isAnonymous: StateFlow<Boolean> = _isAnonymous.asStateFlow()

@@ -14,26 +14,19 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
  * Configure base Kotlin with Android options
  */
 internal fun Project.configureKotlinAndroid(
-  commonExtension: CommonExtension<*, *, *, *, *, *>,
+  commonExtension: CommonExtension,
 ) {
+  // AGP 9's CommonExtension only exposes properties; the configuration blocks live on the
+  // concrete Application/Library extension types.
   commonExtension.apply {
-    compileSdk = 36
-
-    defaultConfig {
-      minSdk = 24
-    }
-
-    compileOptions {
-      sourceCompatibility = JavaVersion.VERSION_17
-      targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    lint {
-      abortOnError = false
-    }
-
-    configureKotlin<KotlinAndroidProjectExtension>()
+    compileSdk = 37
+    defaultConfig.minSdk = 24
+    compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+    compileOptions.targetCompatibility = JavaVersion.VERSION_17
+    lint.abortOnError = false
   }
+
+  configureKotlin<KotlinAndroidProjectExtension>()
 }
 
 /**

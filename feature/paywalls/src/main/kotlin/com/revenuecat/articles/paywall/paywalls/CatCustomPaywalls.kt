@@ -33,33 +33,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.revenuecat.purchases.Offering
 import com.revenuecat.purchases.slidetounlock.HintTexts
+import com.revenuecat.purchases.slidetounlock.SlideState
 import com.revenuecat.purchases.slidetounlock.SlideToUnlock
 import com.revenuecat.purchases.ui.revenuecatui.Paywall
 import com.revenuecat.purchases.ui.revenuecatui.PaywallOptions
 import com.skydoves.compose.effects.RememberedEffect
 
 @Composable
-public fun CatCustomPaywalls(
-  viewModel: CustomCatPaywallsViewModel = hiltViewModel(),
-) {
+public fun CatCustomPaywalls(viewModel: CustomCatPaywallsViewModel = hiltViewModel()) {
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   val purchaseUiState by viewModel.purchaseUiState.collectAsStateWithLifecycle()
   val composeNavigator = currentComposeNavigator
 
   var offering: Offering? by remember { mutableStateOf(null) }
-  var isSlided by remember { mutableStateOf(false) }
+  var slideState by remember { mutableStateOf(SlideState.Idle) }
 
   HandleUiState(uiState = uiState) { offering = it }
 
   HandlePurchaseUiState(
     uiState = purchaseUiState,
     onPurchaseSuccess = { composeNavigator.navigateUp() },
-    onPurchaseFailed = { isSlided = false },
+    onPurchaseFailed = { slideState = SlideState.Idle },
   )
 
   Box(
@@ -82,14 +81,14 @@ public fun CatCustomPaywalls(
           .align(Alignment.BottomCenter)
           .fillMaxWidth()
           .padding(bottom = 60.dp, start = 20.dp, end = 20.dp),
-        isSlided = isSlided,
+        state = slideState,
         hintTexts = HintTexts.defaultHintTexts().copy(
           defaultText = stringResource(
             com.revenuecat.articles.paywall.compose.core.designsystem.R.string.slide_subscribe,
           ),
         ),
         onSlideCompleted = {
-          isSlided = true
+          slideState = SlideState.Loading
           viewModel.handleEvent(
             PaywallEvent.Purchases(
               activity = activity,
@@ -103,10 +102,7 @@ public fun CatCustomPaywalls(
 }
 
 @Composable
-private fun HandleUiState(
-  uiState: PaywallsUiState,
-  onFetchOffering: (Offering) -> Unit,
-) {
+private fun HandleUiState(uiState: PaywallsUiState, onFetchOffering: (Offering) -> Unit) {
   val context = LocalContext.current
 
   RememberedEffect(key1 = uiState) {
