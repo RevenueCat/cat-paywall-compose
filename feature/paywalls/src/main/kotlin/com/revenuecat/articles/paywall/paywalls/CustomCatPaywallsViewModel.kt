@@ -36,9 +36,8 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class CustomCatPaywallsViewModel @Inject constructor(
-  repository: PaywallsRepository,
-) : ViewModel() {
+class CustomCatPaywallsViewModel @Inject constructor(repository: PaywallsRepository) :
+  ViewModel() {
 
   val uiState: StateFlow<PaywallsUiState> = repository.fetchOffering()
     .mapLatest { response ->
@@ -85,10 +84,7 @@ sealed interface PaywallEvent {
 
   data object None : PaywallEvent
 
-  data class Purchases(
-    val activity: Activity,
-    val availablePackage: Package,
-  ) : PaywallEvent
+  data class Purchases(val activity: Activity, val availablePackage: Package) : PaywallEvent
 }
 
 @Stable

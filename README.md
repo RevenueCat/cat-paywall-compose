@@ -125,7 +125,7 @@ You can copy-paste the line below:
 REVENUECAT_API_KEY=<YOUR_API_KEY>
 ```
 
-Also, make sure to update the [application ID](https://github.com/RevenueCat/cat-paywall-compose/blob/main/app/build.gradle.kts#L32) to match the one registered for your project on Google Play.
+Also, make sure to update the [application ID](https://github.com/RevenueCat/cat-paywall-compose/blob/main/app/build.gradle.kts#L31) to match the one registered for your project on Google Play.
 
 Now, build and run the project. You should see the paywall dialog appear in the details screen if you've followed the steps correctly.
 

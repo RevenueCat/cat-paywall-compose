@@ -49,16 +49,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
 import com.revenuecat.purchases.ui.revenuecatui.customercenter.CustomerCenter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountScreen(
-  viewModel: AccountViewModel = hiltViewModel(),
-) {
+fun AccountScreen(viewModel: AccountViewModel = hiltViewModel()) {
   val composeNavigator = currentComposeNavigator
   val isAnonymous by viewModel.isAnonymous.collectAsStateWithLifecycle()
   val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -115,10 +113,7 @@ fun AccountScreen(
 }
 
 @Composable
-private fun LoginForm(
-  onLogin: (String) -> Unit,
-  modifier: Modifier = Modifier,
-) {
+private fun LoginForm(onLogin: (String) -> Unit, modifier: Modifier = Modifier) {
   var userId by remember { mutableStateOf("") }
 
   Column(

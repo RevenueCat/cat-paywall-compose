@@ -36,11 +36,7 @@ import com.revenuecat.purchases.Package
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PromoBottomSheet(
-  offering: Offering,
-  onPurchase: (Package) -> Unit,
-  onDismiss: () -> Unit,
-) {
+fun PromoBottomSheet(offering: Offering, onPurchase: (Package) -> Unit, onDismiss: () -> Unit) {
   ModalBottomSheet(onDismissRequest = onDismiss) {
     Column(
       modifier = Modifier

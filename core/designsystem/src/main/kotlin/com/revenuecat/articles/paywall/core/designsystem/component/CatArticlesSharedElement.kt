@@ -40,21 +40,19 @@ fun Modifier.catArticlesSharedElement(
   renderInOverlayDuringTransition: Boolean = true,
   zIndexInOverlay: Float = 0f,
   clipInOverlayDuringTransition: OverlayClip = ParentClip,
-): Modifier {
-  return if (isLocalInspectionMode) {
-    this
-  } else {
-    with(sharedTransitionScope) {
-      this@catArticlesSharedElement.sharedBounds(
-        sharedContentState = state,
-        animatedVisibilityScope = animatedVisibilityScope,
-        boundsTransform = boundsTransform,
-        placeholderSize = placeholderSize,
-        renderInOverlayDuringTransition = renderInOverlayDuringTransition,
-        zIndexInOverlay = zIndexInOverlay,
-        clipInOverlayDuringTransition = clipInOverlayDuringTransition,
-      )
-    }
+): Modifier = if (isLocalInspectionMode) {
+  this
+} else {
+  with(sharedTransitionScope) {
+    this@catArticlesSharedElement.sharedBounds(
+      sharedContentState = state,
+      animatedVisibilityScope = animatedVisibilityScope,
+      boundsTransform = boundsTransform,
+      placeholderSize = placeholderSize,
+      renderInOverlayDuringTransition = renderInOverlayDuringTransition,
+      zIndexInOverlay = zIndexInOverlay,
+      clipInOverlayDuringTransition = clipInOverlayDuringTransition,
+    )
   }
 }
 
@@ -65,9 +63,7 @@ private val ParentClip: OverlayClip =
       bounds: Rect,
       layoutDirection: LayoutDirection,
       density: Density,
-    ): Path? {
-      return state.parentSharedContentState?.clipPathInOverlay
-    }
+    ): Path? = state.parentSharedContentState?.clipPathInOverlay
   }
 
 private val DefaultSpring = spring(

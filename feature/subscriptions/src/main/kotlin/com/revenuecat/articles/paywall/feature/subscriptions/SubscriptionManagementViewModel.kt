@@ -30,9 +30,8 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class SubscriptionManagementViewModel @Inject constructor(
-  repository: PaywallsRepository,
-) : ViewModel() {
+class SubscriptionManagementViewModel @Inject constructor(repository: PaywallsRepository) :
+  ViewModel() {
 
   val uiState: StateFlow<SubscriptionManagementUiState> = combine(
     repository.fetchOffering(),
@@ -74,10 +73,8 @@ sealed interface SubscriptionManagementUiState {
 
   data object Loading : SubscriptionManagementUiState
 
-  data class Success(
-    val offering: Offering,
-    val customerInfo: CustomerInfo,
-  ) : SubscriptionManagementUiState
+  data class Success(val offering: Offering, val customerInfo: CustomerInfo) :
+    SubscriptionManagementUiState
 
   data class Error(val message: String) : SubscriptionManagementUiState
 }

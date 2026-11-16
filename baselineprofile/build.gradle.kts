@@ -15,14 +15,13 @@
  */
 plugins {
   alias(libs.plugins.android.test)
-  alias(libs.plugins.kotlin.android)
   alias(libs.plugins.baselineprofile)
   id("revenuecat.spotless")
 }
 
 android {
   namespace = "com.revenuecat.articles.paywall.baselineprofile"
-  compileSdk = 36
+  compileSdk = 37
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -31,14 +30,14 @@ android {
 
   defaultConfig {
     minSdk = 28
-    targetSdk = 36
+    targetSdk = 37
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   targetProjectPath = ":app"
 
-  testOptions.managedDevices.devices {
-    maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel6api31").apply {
+  testOptions.managedDevices.localDevices {
+    create("pixel6api31") {
       device = "Pixel 6"
       apiLevel = 31
       systemImageSource = "aosp"
