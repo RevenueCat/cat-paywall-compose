@@ -40,6 +40,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,13 +61,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.revenuecat.articles.paywall.compose.core.designsystem.R
 import com.revenuecat.articles.paywall.core.designsystem.component.CatArticlesAppBar
 import com.revenuecat.articles.paywall.core.designsystem.component.CatArticlesCircularProgress
+import com.revenuecat.articles.paywall.core.designsystem.component.PremiumBadge
 import com.revenuecat.articles.paywall.core.designsystem.component.catArticlesSharedElement
 import com.revenuecat.articles.paywall.core.designsystem.theme.CatArticlesTheme
 import com.revenuecat.articles.paywall.core.model.Article
+import com.revenuecat.articles.paywall.core.model.ArticleAccess
+import com.revenuecat.articles.paywall.core.model.DAILY_FREE_ARTICLE_LIMIT
 import com.revenuecat.articles.paywall.core.model.MockUtils.mockArticle
+import com.revenuecat.articles.paywall.core.model.resolveArticleAccess
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.core.navigation.boundsTransform
 import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
+import com.revenuecat.articles.paywall.paywalls.PremiumPaywallDialog
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.components.rememberImageComponent
 import com.skydoves.landscapist.image.LandscapistImage
@@ -84,6 +92,7 @@ fun CatArticlesHome(
   val composeNavigator = currentComposeNavigator
   val entitlementIdentifier = stringResource(R.string.entitlement_premium)
   val isEntitled = customerInfo?.entitlements?.get(entitlementIdentifier)?.isActive == true
+  var premiumPaywallArticle by rememberSaveable { mutableStateOf<Article?>(null) }
 
   Column(modifier = Modifier.fillMaxSize()) {
     CatArticlesAppBar(
@@ -114,10 +123,10 @@ fun CatArticlesHome(
       sharedTransitionScope = sharedTransitionScope,
       animatedContentScope = animatedContentScope,
       onNavigateToDetails = { article ->
-        if (!isEntitled && todayReadCount >= 3) {
-          composeNavigator.navigate(CatArticlesScreen.Paywalls)
-        } else {
-          composeNavigator.navigate(CatArticlesScreen.CatArticle(article))
+        when (resolveArticleAccess(article, isEntitled, todayReadCount)) {
+          ArticleAccess.Open -> composeNavigator.navigate(CatArticlesScreen.CatArticle(article))
+          ArticleAccess.PremiumPaywall -> premiumPaywallArticle = article
+          ArticleAccess.DailyLimitPaywall -> composeNavigator.navigate(CatArticlesScreen.Paywalls)
         }
       },
       onToggleBookmark = { title ->
@@ -126,6 +135,17 @@ fun CatArticlesHome(
         } else {
           composeNavigator.navigate(CatArticlesScreen.Paywalls)
         }
+      },
+    )
+  }
+
+  premiumPaywallArticle?.let { article ->
+    PremiumPaywallDialog(
+      article = article,
+      onClose = {
+        premiumPaywallArticle = null
+        // Otherwise a purchase made in the dialog leaves this screen showing a stale entitlement.
+        catArticlesViewModel.refreshCustomerInfo()
       },
     )
   }
@@ -160,6 +180,7 @@ private fun HomeContent(
             ArticleCard(
               article = article,
               isBookmarked = article.title in bookmarkedTitles,
+              isEntitled = isEntitled,
               sharedTransitionScope = sharedTransitionScope,
               animatedContentScope = animatedContentScope,
               onNavigateToDetails = onNavigateToDetails,
@@ -174,7 +195,7 @@ private fun HomeContent(
 
 @Composable
 private fun QuotaBanner(todayReadCount: Int) {
-  val limitReached = todayReadCount >= 3
+  val limitReached = todayReadCount >= DAILY_FREE_ARTICLE_LIMIT
   val bannerColor = if (limitReached) {
     Color(
       0xFFFFF3CD,
@@ -186,7 +207,7 @@ private fun QuotaBanner(todayReadCount: Int) {
   val message = if (limitReached) {
     "Daily limit reached · Subscribe for unlimited access"
   } else {
-    "$todayReadCount / 3 free articles read today"
+    "$todayReadCount / $DAILY_FREE_ARTICLE_LIMIT free articles read today"
   }
 
   Row(
@@ -209,6 +230,7 @@ private fun QuotaBanner(todayReadCount: Int) {
 private fun ArticleCard(
   article: Article,
   isBookmarked: Boolean,
+  isEntitled: Boolean,
   sharedTransitionScope: SharedTransitionScope,
   animatedContentScope: AnimatedContentScope,
   onNavigateToDetails: (Article) -> Unit,
@@ -257,6 +279,16 @@ private fun ArticleCard(
         fontSize = 14.sp,
         fontWeight = FontWeight.Bold,
       )
+
+      if (article.premium) {
+        PremiumBadge(
+          isLocked = !isEntitled,
+          // The end padding keeps the 48dp bookmark button at the top end clear.
+          modifier = Modifier
+            .align(Alignment.TopStart)
+            .padding(start = 12.dp, top = 12.dp, end = 48.dp),
+        )
+      }
 
       IconButton(
         modifier = Modifier.align(Alignment.TopEnd),

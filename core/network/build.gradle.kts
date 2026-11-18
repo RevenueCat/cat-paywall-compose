@@ -33,4 +33,7 @@ dependencies {
 
   api(libs.retrofit.kotlinx.serialization)
   api(libs.kotlinx.serialization.json)
+
+  // Testing
+  testImplementation(libs.junit)
 }

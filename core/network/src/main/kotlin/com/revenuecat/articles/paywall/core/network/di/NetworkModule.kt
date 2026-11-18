@@ -43,7 +43,7 @@ internal object NetworkModule {
   fun provideArticlesRetrofit(networkJson: Json): Retrofit = Retrofit.Builder()
     .baseUrl(
       "https://gist.githubusercontent.com/skydoves/f3836488f8d4f1bf3e3c239759d92c0d/raw/" +
-        "7f184b9ddeaf28eb69823dfba0316c045a9a2d36/",
+        "1376ef30281e9c9c0322c88281ea09d572b892a4/",
     )
     .addConverterFactory(networkJson.asConverterFactory("application/json".toMediaType()))
     .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())

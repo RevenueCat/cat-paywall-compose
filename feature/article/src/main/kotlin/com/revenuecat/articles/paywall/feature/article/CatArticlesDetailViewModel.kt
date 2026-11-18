@@ -18,6 +18,7 @@ package com.revenuecat.articles.paywall.feature.article
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.revenuecat.articles.paywall.core.model.DAILY_FREE_ARTICLE_LIMIT
 import com.revenuecat.articles.paywall.coredata.repository.BookmarksRepository
 import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
 import com.revenuecat.articles.paywall.coredata.repository.ReadingTrackerRepository
@@ -86,7 +87,7 @@ class CatArticlesDetailViewModel @Inject constructor(
     promoShownThisSession,
   ) { count, info, shown ->
     val isEntitled = info?.entitlements?.active?.isNotEmpty() == true
-    count == 3 && !isEntitled && !shown
+    count == DAILY_FREE_ARTICLE_LIMIT && !isEntitled && !shown
   }.stateIn(
     scope = viewModelScope,
     started = SharingStarted.WhileSubscribed(5_000),

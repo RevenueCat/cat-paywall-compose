@@ -32,4 +32,6 @@ data class Article(
   val author: String,
   val date: String,
   val cover: String,
+  // Absent from the payload for free articles, so it must default to false.
+  val premium: Boolean = false,
 ) : Parcelable

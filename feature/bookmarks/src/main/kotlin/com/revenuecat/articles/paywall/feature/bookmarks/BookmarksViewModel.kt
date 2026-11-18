@@ -21,12 +21,18 @@ import androidx.lifecycle.viewModelScope
 import com.revenuecat.articles.paywall.core.model.Article
 import com.revenuecat.articles.paywall.coredata.repository.ArticlesRepository
 import com.revenuecat.articles.paywall.coredata.repository.BookmarksRepository
+import com.revenuecat.articles.paywall.coredata.repository.PaywallsRepository
+import com.revenuecat.purchases.CustomerInfo
 import com.skydoves.sandwich.fold
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @Stable
@@ -40,6 +46,7 @@ sealed interface BookmarksUiState {
 class BookmarksViewModel @Inject constructor(
   articlesRepository: ArticlesRepository,
   bookmarksRepository: BookmarksRepository,
+  paywallsRepository: PaywallsRepository,
 ) : ViewModel() {
 
   val uiState: StateFlow<BookmarksUiState> = combine(
@@ -58,4 +65,20 @@ class BookmarksViewModel @Inject constructor(
     started = SharingStarted.WhileSubscribed(5_000),
     initialValue = BookmarksUiState.Loading,
   )
+
+  private val customerInfoRequests = MutableStateFlow(0)
+
+  val customerInfo: StateFlow<CustomerInfo?> = customerInfoRequests
+    .flatMapLatest { paywallsRepository.fetchCustomerInfo() }
+    .map { it.fold(onSuccess = { c -> c }, onFailure = { null }) }
+    .stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(5_000),
+      initialValue = null,
+    )
+
+  /** Re-reads [customerInfo], which is otherwise read only once per subscription. */
+  fun refreshCustomerInfo() {
+    customerInfoRequests.update { it + 1 }
+  }
 }

@@ -33,4 +33,7 @@ dependencies {
   api(libs.kotlinx.serialization.json)
 
   compileOnly(libs.compose.stable.marker)
+
+  // Testing
+  testImplementation(libs.junit)
 }

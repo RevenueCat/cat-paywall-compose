@@ -26,11 +26,14 @@ import com.revenuecat.articles.paywall.coredata.repository.ReadingTrackerReposit
 import com.revenuecat.purchases.CustomerInfo
 import com.skydoves.sandwich.fold
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -61,7 +64,10 @@ class CatArticlesViewModel @Inject constructor(
       initialValue = emptySet(),
     )
 
-  val customerInfo: StateFlow<CustomerInfo?> = paywallsRepository.fetchCustomerInfo()
+  private val customerInfoRequests = MutableStateFlow(0)
+
+  val customerInfo: StateFlow<CustomerInfo?> = customerInfoRequests
+    .flatMapLatest { paywallsRepository.fetchCustomerInfo() }
     .map { it.fold(onSuccess = { c -> c }, onFailure = { null }) }
     .stateIn(
       scope = viewModelScope,
@@ -78,6 +84,11 @@ class CatArticlesViewModel @Inject constructor(
 
   fun toggleBookmark(articleTitle: String) {
     viewModelScope.launch { bookmarksRepository.toggleBookmark(articleTitle) }
+  }
+
+  /** Re-reads [customerInfo], which is otherwise read only once per subscription. */
+  fun refreshCustomerInfo() {
+    customerInfoRequests.update { it + 1 }
   }
 }
 
