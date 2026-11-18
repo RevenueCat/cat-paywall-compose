@@ -131,6 +131,32 @@ Now, build and run the project. You should see the paywall dialog appear in the 
 
 > **Note:** Ensure your device is signed into Google Play, especially if you're running the project on an emulator.
 
+## 🔒 Premium-only Articles
+
+Articles come from a pinned revision of the [articles gist](https://gist.githubusercontent.com/skydoves/f3836488f8d4f1bf3e3c239759d92c0d/raw/1376ef30281e9c9c0322c88281ea09d572b892a4/articles.json). Articles marked with `"premium": true` are premium-only; articles without the key are free (`Article.premium` defaults to `false`).
+
+Tapping an article runs a single access rule, `resolveArticleAccess` in `core/model`, in this order:
+
+1. The `premium` entitlement is active: the article opens.
+2. The article is premium: the premium paywall is shown. Premium articles never open without the entitlement, and the daily free quota never gates them.
+3. 3 or more articles were read today: the existing daily-limit paywall is shown.
+4. Otherwise the article opens.
+
+The home grid applies the full rule. The bookmarks list applies only the premium part, so a lapsed subscriber tapping a bookmarked premium article gets the premium paywall. Premium articles show a "Premium" pill, with a lock while the user is not entitled.
+
+The premium paywall is `PremiumPaywallDialog` in `feature/paywalls`, built on RevenueCatUI's `PaywallDialog`. When a purchase or restore activates the `premium` entitlement, the dialog closes and the tapped article opens. Closing it without purchasing keeps the user where they were.
+
+## 🎁 Exit Offers
+
+An exit offer is an alternative paywall that RevenueCat presents when a user dismisses a paywall without purchasing, for example with a discounted package. The premium paywall uses `PaywallDialog`, which shows the configured exit offer automatically before the final dismissal. The embedded `Paywall` composable (used by the slide-to-unlock paywall screen) does not support exit offers. See [Displaying Paywalls](https://www.revenuecat.com/docs/tools/paywalls/displaying-paywalls?utm_medium=organic&utm_source=github&utm_campaign=advocate).
+
+Exit offers are configured entirely in the RevenueCat dashboard, no code change needed:
+
+1. Create a second Offering with the packages for the exit offer, and create its own paywall.
+2. In the Paywall Editor of the main paywall, open **Paywall settings** and choose the second Offering as the **Exit offer**.
+
+See [Creating Paywalls](https://www.revenuecat.com/docs/tools/paywalls/creating-paywalls?utm_medium=organic&utm_source=github&utm_campaign=advocate) for details.
+
 ## 🏛️ Architecture
 
 This project follows [Google's official architecture guidance](https://developer.android.com/topic/architecture).

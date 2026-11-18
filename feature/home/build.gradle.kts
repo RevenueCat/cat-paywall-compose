@@ -26,6 +26,9 @@ android {
 }
 
 dependencies {
+  // Premium paywall dialog
+  implementation(projects.feature.paywalls)
+
   // RevenueCat Purchases
   implementation(libs.revenuecat)
 
@@ -35,4 +38,10 @@ dependencies {
   implementation(libs.androidx.compose.foundation)
   implementation(libs.androidx.compose.material)
   implementation(libs.androidx.compose.runtime)
+
+  // Testing
+  testImplementation(libs.junit)
+  testImplementation(libs.mockk)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.turbine)
 }

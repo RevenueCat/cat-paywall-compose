@@ -63,6 +63,7 @@ import com.revenuecat.articles.paywall.core.designsystem.component.catArticlesSh
 import com.revenuecat.articles.paywall.core.designsystem.component.fadingEdge
 import com.revenuecat.articles.paywall.core.designsystem.theme.CatArticlesTheme
 import com.revenuecat.articles.paywall.core.model.Article
+import com.revenuecat.articles.paywall.core.model.DAILY_FREE_ARTICLE_LIMIT
 import com.revenuecat.articles.paywall.core.model.MockUtils.mockArticle
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.core.navigation.boundsTransform
@@ -123,7 +124,7 @@ private fun CatArticlesDetailContent(
   val entitlementIdentifier = stringResource(R.string.entitlement_premium)
   val isEntitled = customerInfo?.entitlements[entitlementIdentifier]?.isActive == true
   val isBookmarked = article.title in bookmarkedTitles
-  val isQuotaExceeded = todayReadCount > 3 && !isEntitled
+  val isQuotaExceeded = todayReadCount > DAILY_FREE_ARTICLE_LIMIT && !isEntitled
 
   LaunchedEffect(article.title) {
     viewModel.recordRead(article.title)

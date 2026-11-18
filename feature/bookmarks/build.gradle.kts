@@ -27,4 +27,7 @@ android {
 
 dependencies {
   implementation(projects.core.model)
+
+  // Premium paywall dialog
+  implementation(projects.feature.paywalls)
 }

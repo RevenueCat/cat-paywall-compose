@@ -42,17 +42,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.revenuecat.articles.paywall.compose.core.designsystem.R
+import com.revenuecat.articles.paywall.core.designsystem.component.PremiumBadge
 import com.revenuecat.articles.paywall.core.designsystem.component.catArticlesSharedElement
 import com.revenuecat.articles.paywall.core.model.Article
+import com.revenuecat.articles.paywall.core.model.ArticleAccess
+import com.revenuecat.articles.paywall.core.model.resolveArticleAccess
 import com.revenuecat.articles.paywall.core.navigation.CatArticlesScreen
 import com.revenuecat.articles.paywall.core.navigation.boundsTransform
 import com.revenuecat.articles.paywall.core.navigation.currentComposeNavigator
+import com.revenuecat.articles.paywall.paywalls.PremiumPaywallDialog
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +72,10 @@ fun BookmarksScreen(
 ) {
   val navigator = currentComposeNavigator
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+  val customerInfo by viewModel.customerInfo.collectAsStateWithLifecycle()
+  val entitlementIdentifier = stringResource(R.string.entitlement_premium)
+  val isEntitled = customerInfo?.entitlements?.get(entitlementIdentifier)?.isActive == true
+  var premiumPaywallArticle by rememberSaveable { mutableStateOf<Article?>(null) }
 
   Scaffold(
     topBar = {
@@ -121,13 +134,34 @@ fun BookmarksScreen(
         items(state.articles, key = { it.title }) { article ->
           BookmarkArticleCard(
             article = article,
+            isEntitled = isEntitled,
             sharedTransitionScope = sharedTransitionScope,
             animatedContentScope = animatedContentScope,
-            onClick = { navigator.navigate(CatArticlesScreen.CatArticle(article)) },
+            onClick = {
+              // Only the premium part of the rule applies: bookmarks were never quota gated, so
+              // every other result opens the article and the read count does not matter.
+              val access = resolveArticleAccess(article, isEntitled, todayReadCount = 0)
+              if (access == ArticleAccess.PremiumPaywall) {
+                premiumPaywallArticle = article
+              } else {
+                navigator.navigate(CatArticlesScreen.CatArticle(article))
+              }
+            },
           )
         }
       }
     }
+  }
+
+  premiumPaywallArticle?.let { article ->
+    PremiumPaywallDialog(
+      article = article,
+      onClose = {
+        premiumPaywallArticle = null
+        // Otherwise a purchase made in the dialog leaves this screen showing a stale entitlement.
+        viewModel.refreshCustomerInfo()
+      },
+    )
   }
 }
 
@@ -135,6 +169,7 @@ fun BookmarksScreen(
 @Composable
 private fun BookmarkArticleCard(
   article: Article,
+  isEntitled: Boolean,
   sharedTransitionScope: SharedTransitionScope,
   animatedContentScope: AnimatedContentScope,
   onClick: () -> Unit,
@@ -163,6 +198,10 @@ private fun BookmarkArticleCard(
         text = article.author,
         style = MaterialTheme.typography.bodySmall,
       )
+      if (article.premium) {
+        Spacer(modifier = Modifier.height(4.dp))
+        PremiumBadge(isLocked = !isEntitled)
+      }
     }
   }
 }
